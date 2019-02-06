@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools" tools:showIn="navigation_view">
+    <item android:title="Menu">
+        <menu>
+            <item
+                android:icon="@drawable/home"
+                android:id="@+id/nav_menu_utama"
+                android:title="Menu Utama" />
+            <item
+                android:icon="@drawable/task"
+                android:id="@+id/task"
+                android:title="Daftar Pekerjaan" />
+            <item
+                android:icon="@drawable/task_done"
+                android:id="@+id/task_done"
+                android:title="Daftar Selesai" />
+            <item
+                android:icon="@drawable/logout2"
+                android:id="@+id/nav_keluar"
+                android:title="Keluar" />
+        </menu>
+    </item>
+</menu>

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools" tools:showIn="navigation_view">
+    <item android:title="Menu Teknisi">
+        <menu>
+            <item android:id="@+id/nav_order_petugas"
+                android:title="Order Teknisi" />
+            <item android:id="@+id/nav_list_order"
+                android:title="List Order" />
+
+            <item android:id="@+id/nav_logout"
+                android:title="Logout" />
+        </menu>
+    </item>
+</menu>

@@ -1,0 +1,16 @@
+<resources>
+    <string name="app_name">Reportku</string>
+
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+
+    <string name="action_settings">Settings</string>
+    <string name="alert_ring_kosong">keterangan other ring tidak boleh kosong</string>
+    <string name="alert_nama_kosong">Nama Task Tidak Boleh Kosong</string>
+    <string name="alert_deskripsi_kosong">Deskripsi Task Tidak Boleh Kosong</string>
+    <string name="title_activity_maps">Map</string>
+    <string name="title_activity_maps2">Map</string>
+    <string name="title_activity_maps3">Map</string>
+    <string name="title_activity_maps4">Map</string>
+    <string name="title_activity_maps5">Map</string>
+</resources>
