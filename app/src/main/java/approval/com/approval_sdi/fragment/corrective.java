@@ -63,14 +63,17 @@ public class corrective extends android.support.v4.app.Fragment {
     private static final 	String PREFER_NAME 	= "AndroidExamplePref";
 
     SharedPreferences sharedPreferences;
-    String s_;
+    String s_type;
+    String s_submit;
 
     ArrayList<HashMap<String,String>> ahas = new ArrayList<HashMap<String, String>>();
     @SuppressLint("ValidFragment")
     public corrective(String s){
         // Required empty public constructor
-        s_ = s;
+        s_type = s;
+
     }
+
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -85,8 +88,10 @@ public class corrective extends android.support.v4.app.Fragment {
         img_empty = (ImageView)v.findViewById(R.id.empty);
         //Toast.makeText(getActivity(),s_,Toast.LENGTH_LONG).show();
         sharedPreferences = getActivity().getSharedPreferences(PREFER_NAME, Context.MODE_PRIVATE);
-        s_id_user = sharedPreferences.getString(KEY_USERNAME, "");
-        Log.v("logUrl",s_id_user);
+        s_id_user = sharedPreferences.getString(KEY_USERNAME, null);
+        s_is_done = getActivity().getIntent().getStringExtra("is_done");
+        s_submit  = getActivity().getIntent().getStringExtra("submit");
+
         new get_list().execute();
         return v;
     }
@@ -100,11 +105,10 @@ public class corrective extends android.support.v4.app.Fragment {
             JSONObject object = null;
 
             JSONParser jsParser  = new JSONParser();
-            object = jsParser.AmbilJson(url_list+"?id_user="+s_id_user+"&type=2&is_done="+s_is_done);
-            Log.v("logUrl",url_list+"?id_user="+s_id_user+"&type=2&is_done="+s_is_done);
+            object = jsParser.AmbilJson(url_list+"?id_user="+s_id_user+"&is_done="+s_is_done+"&type="+s_type);
+            Log.v("logUrl",url_list+"?id_user="+s_id_user+"&is_done="+s_is_done+"&type="+s_type);
             try{
                 jsArray = object.getJSONArray("data");
-                Log.v("seta",String.valueOf(jsArray.length()));
                 for(int in = 0;in<jsArray.length();in++){
                     JSONObject ob = jsArray.getJSONObject(in);
                     HashMap<String,String> hmString = new HashMap<String,String>();
@@ -118,7 +122,6 @@ public class corrective extends android.support.v4.app.Fragment {
 
                     ahas.add(hmString);
                 }
-
 
             }catch (Exception e){
             }
@@ -163,7 +166,6 @@ public class corrective extends android.support.v4.app.Fragment {
                         deskripsi  = value;
                     }
 
-
                 }
 
                 LayoutInflater ln = (LayoutInflater)getActivity().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
@@ -171,19 +173,23 @@ public class corrective extends android.support.v4.app.Fragment {
                 TextView txt_task            = (TextView)v.findViewById(R.id.task);
                 TextView txt_deskirpsi       = (TextView)v.findViewById(R.id.description);
                 final TextView txt_id_task         = (TextView)v.findViewById(R.id.id_task);
+                final LinearLayout ln_    = (LinearLayout)v.findViewById(R.id.ln_);
+
 
                 txt_task.setText(task);
                 txt_deskirpsi.setText(deskripsi);
                 txt_id_task.setText(id);
 
-
-                listlinear.setOnClickListener(new View.OnClickListener() {
+                ln_.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
                         Intent in = new Intent(getActivity(),detil_view_laporan.class);
                         in.putExtra("id",txt_id_task.getText().toString());
+                        in.putExtra("submit",s_submit);
+                        in.putExtra("is_done",s_is_done);
+                        in.putExtra("type",s_type);
                         startActivity(in);
-                        getActivity().finish();
+                        //getActivity().finish();
 
                     }
                 });

@@ -16,25 +16,31 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
-            <TextView
-                android:textStyle="bold"
-                android:layout_gravity="center"
-                android:text="New Task"
-                android:textSize="10pt"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
-
-            <TextView
-                android:textStyle="bold"
-                android:text="Task Name :"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
-
-            <EditText
-                android:hint="isi disini..."
-                android:id="@+id/nama_task"
+            <LinearLayout
+                android:id="@+id/ln_vis"
+                android:orientation="vertical"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
+                android:layout_height="wrap_content">
+
+                <TextView
+                    android:textStyle="bold"
+                    android:layout_gravity="center"
+                    android:text="New Task"
+                    android:textSize="10pt"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
+
+                <TextView
+                    android:textStyle="bold"
+                    android:text="Task Name :"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
+
+                <EditText
+                    android:hint="isi disini..."
+                    android:id="@+id/nama_task"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" />
 
                 <LinearLayout
                     android:padding="10dp"
@@ -100,11 +106,16 @@
 
                 </LinearLayout>
 
-            <EditText
-                android:visibility="gone"
-                android:id="@+id/id_task"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
+                <EditText
+                    android:visibility="gone"
+                    android:id="@+id/id_task"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" />
+
+
+            </LinearLayout>
+
+
 
             <TextView
                 android:textStyle="bold"

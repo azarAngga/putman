@@ -5,11 +5,18 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
+import android.support.annotation.NonNull;
+import android.support.v4.content.ContextCompat;
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
@@ -20,12 +27,17 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
 
 import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 
 import reportku.com.id.R;
+
+import static approval.com.approval_sdi.progress_order.REQUEST_PERMISSION;
 
 
 public class login extends Activity{
@@ -144,6 +156,7 @@ public class login extends Activity{
                         session.createUserLoginSession(a[1],s_nama,password.getText().toString(),a[3].trim());
                         Log.v("texx",role_id);
                         Intent i = null;
+                        createDir();
                         i = new Intent(login.this, menu_role.class);
                         startActivity(i);
                         finish();
@@ -198,6 +211,15 @@ public class login extends Activity{
             finish();
         }
 
+        Window window = this.getWindow();
+        // clear FLAG_TRANSLUCENT_STATUS flag:
+        window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+        // add FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS flag to the window
+        window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            window.setStatusBarColor(ContextCompat.getColor(this,R.color.colorPrimary));
+        }
+
         login 		= (Button)findViewById(R.id.btn_login);
         username 	= (EditText)findViewById(R.id.ed_username);
         password	= (EditText)findViewById(R.id.ed_password);
@@ -243,4 +265,15 @@ public class login extends Activity{
         }
         return result;
     }
+
+    public void createDir() {
+        // create a File object for the parent directory
+        String dir = "/sdcard/reportku/";
+        File wallpaperDirectory = new File(dir);
+        // have the object build the directory structure, if needed.
+        wallpaperDirectory.mkdirs();
+    }
+
+
+
 }

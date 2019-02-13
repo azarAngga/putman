@@ -158,7 +158,7 @@ public class progress_order extends AppCompatActivity
     String id_creator ="1";
     modelData model;
     String s_type = null;
-    String s_address = null;
+    String s_address = "-";
 
 
     @Override
@@ -345,26 +345,24 @@ public class progress_order extends AppCompatActivity
         // Handle navigation view item clicks here.
         int id = item.getItemId();
         Intent in = null;
-        if (id == R.id.nav_list_order) {
-             in.putExtra("id_status","1");
-            finish();
-        } else if (id == R.id.nav_order_petugas) {
-            in.putExtra("id_status","2");
-            finish();
-        }else if(id == R.id.nav_order_petugas){
-            in.putExtra("id_status","3");
-            finish();
-        }else if(id == R.id.home){
+        if(id == R.id.nav_menu_utama){
             in  = new Intent(progress_order.this,menu_role.class);
             startActivity(in);
         }else if(id == R.id.task){
             in  = new Intent(progress_order.this,fragmen_history.class);
-            in.putExtra("type","1"); // task
+
+            in.putExtra("submit","1"); // task
+            in.putExtra("is_done","0"); // task
             startActivity(in);
         }else if(id == R.id.task_done){
             in  = new Intent(progress_order.this,fragmen_history.class);
-            in.putExtra("type","2"); // done
+
+            in.putExtra("submit","0"); // task
+            in.putExtra("is_done","1"); // task
             startActivity(in);
+        }else if(id == R.id.nav_keluar){
+            session.logoutUser();
+            finish();
         }
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
@@ -641,7 +639,10 @@ public class progress_order extends AppCompatActivity
 
         foto.setImageURI(Uri.parse(imageFilePath));
 
-        Bitmap myBitmap = BitmapFactory.decodeFile(imageFilePath);
+        final BitmapFactory.Options options = new BitmapFactory.Options();
+        options.inSampleSize = 8;
+
+        Bitmap myBitmap = BitmapFactory.decodeFile(imageFilePath,options);
         foto.setImageBitmap(myBitmap);
         foto.setRotation(90);
 
@@ -929,7 +930,10 @@ public class progress_order extends AppCompatActivity
             if (resultCode == RESULT_OK) {
                 //img.setImageURI(Uri.parse(imageFilePath));
 
-                Bitmap myBitmap = BitmapFactory.decodeFile(imageFilePath);
+                final BitmapFactory.Options options = new BitmapFactory.Options();
+                options.inSampleSize = 8;
+
+                Bitmap myBitmap = BitmapFactory.decodeFile(imageFilePath,options);
                 img.setImageBitmap(myBitmap);
                 img.setRotation(90);
                 img.setImageBitmap(Bitmap.createScaledBitmap(myBitmap, 1600, 1200, false));
@@ -1455,7 +1459,7 @@ public class progress_order extends AppCompatActivity
                         new putProgress().execute();
                         img.setImageDrawable(ctx.getDrawable(R.drawable.camera));
                         img.setRotation(0);
-
+                        Toast.makeText(progress_order.this,"Data Berhasil Terinsert",Toast.LENGTH_LONG).show();
                     }else{
                         Toast.makeText(progress_order.this,"Upload gagal check koneksi anda terlebih dahulu",Toast.LENGTH_LONG).show();
                     }
@@ -1575,7 +1579,7 @@ public class progress_order extends AppCompatActivity
                         "&url_name="+S_nama_foto+
                         "&latitude="+S_latitude+
                         "&longitude="+S_longitude+
-                        "&S_address="+S_address+
+                        "&address="+S_address+
                         "&type="+s_type+
                         "&creator="+id_creator
                 );
@@ -1994,8 +1998,6 @@ public class progress_order extends AppCompatActivity
                 Intent in = new Intent(progress_order.this,progress_order.class);
                 in.putExtra("program",s_type);
                 startActivity(in);
-
-                Toast.makeText(ctx,"yes",Toast.LENGTH_LONG).show();
             }
         });
         builder.setNegativeButton("Tidak", new DialogInterface.OnClickListener() {

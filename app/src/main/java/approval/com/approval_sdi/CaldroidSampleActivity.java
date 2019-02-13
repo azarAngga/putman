@@ -1,5 +1,6 @@
 package approval.com.approval_sdi;
 
+import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
@@ -59,6 +60,7 @@ public class CaldroidSampleActivity extends AppCompatActivity {
         // Setup caldroid fragment
         // **** If you want normal CaldroidFragment, use below line ****
         caldroidFragment = new CaldroidFragment();
+
 
         // //////////////////////////////////////////////////////////////////////
         // **** This is to show customized fragment. If you want customized

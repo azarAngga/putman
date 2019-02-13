@@ -167,7 +167,7 @@ public class fragmen_history extends AppCompatActivity {
 
     private void setupViewPager(ViewPager viewPager) {
         ViewPagerAdapter adapter = new ViewPagerAdapter(getSupportFragmentManager());
-        adapter.addFrag(new preventive("1"),"Preventive");
+        adapter.addFrag(new corrective("1"),"Preventive");
         adapter.addFrag(new corrective("2"),"Corrective");
         //adapter.addFrag(new list_location(),"nearby public location");
         viewPager.setAdapter(adapter);

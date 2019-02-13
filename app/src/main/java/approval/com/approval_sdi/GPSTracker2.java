@@ -73,12 +73,13 @@ public class GPSTracker2 extends Service implements LocationListener {
 						//                                          int[] grantResults)
 						// to handle the case where the user grants the permission. See the documentation
 						// for ActivityCompat#requestPermissions for more details.
+						locationManager.requestLocationUpdates(
+								LocationManager.NETWORK_PROVIDER,
+								MIN_TIME_BW_UPDATES,
+								MIN_DISTANCE_CHANGE_FOR_UPDATES, this);
 						return null;
 					}
-					locationManager.requestLocationUpdates(
-							LocationManager.NETWORK_PROVIDER,
-							MIN_TIME_BW_UPDATES,
-							MIN_DISTANCE_CHANGE_FOR_UPDATES, this);
+
 					Log.d("Network", "Network");
 					if (locationManager != null) {
 						location = locationManager

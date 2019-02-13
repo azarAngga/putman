@@ -10,6 +10,7 @@ import android.os.Bundle;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
@@ -83,7 +84,7 @@ public class report_progress extends AppCompatActivity {
             if(type.equals("1")){
                 if (caldroidFragment != null) {
                     ColorDrawable blue = new ColorDrawable(getResources().getColor(R.color.blue));
-                    ColorDrawable green = new ColorDrawable(Color.GREEN);
+                    //ColorDrawable green = new ColorDrawable(Color.GREEN);
                     caldroidFragment.setBackgroundDrawableForDate(blue, blueDate);
                     //caldroidFragment.setBackgroundDrawableForDate(green, greenDate);
                     caldroidFragment.setTextColorForDate(R.color.white, blueDate);
@@ -92,8 +93,8 @@ public class report_progress extends AppCompatActivity {
             //corective
             }else if(type.equals("2")){
                 if (caldroidFragment != null) {
-                    //ColorDrawable blue = new ColorDrawable(getResources().getColor(R.color.blue));
-                    ColorDrawable green = new ColorDrawable(Color.GREEN);
+                    ColorDrawable green = new ColorDrawable(getResources().getColor(R.color.green));
+                    //ColorDrawable green = new ColorDrawable(Color.GREEN);
                     caldroidFragment.setBackgroundDrawableForDate(green, blueDate);
                     //caldroidFragment.setBackgroundDrawableForDate(green, greenDate);
                     caldroidFragment.setTextColorForDate(R.color.white, blueDate);
@@ -123,19 +124,19 @@ public class report_progress extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.call_droid);
         session 	= new UserSessionManager(getApplicationContext());
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         final SimpleDateFormat formatter = new SimpleDateFormat("dd MMM yyyy");
-        Button logout = (Button)findViewById(R.id.logout);
-        logout.setOnClickListener(new View.OnClickListener() {
+
+        caldroidFragment = new CaldroidFragment();
+
+        final Button all_task = (Button)findViewById(R.id.all_task);
+        all_task.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent in = new Intent(report_progress.this,login.class);
+                Intent in = new Intent(report_progress.this,all_task.class);
                 startActivity(in);
-                session.logoutUser();
             }
         });
-        // Setup caldroid fragment
-        // **** If you want normal CaldroidFragment, use below line ****
-        caldroidFragment = new CaldroidFragment();
 
         // //////////////////////////////////////////////////////////////////////
         // **** This is to show customized fragment. If you want customized
@@ -186,8 +187,6 @@ public class report_progress extends AppCompatActivity {
                 in.putExtra("date",date.toString());
 
                 startActivity(in);
-                //Toast.makeText(getApplicationContext(), date.toString(),
-                       // Toast.LENGTH_SHORT).show();
             }
 
             @Override
@@ -404,4 +403,9 @@ public class report_progress extends AppCompatActivity {
         }
     }
 
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        finish();
+        return super.onOptionsItemSelected(item);
+    }
 }

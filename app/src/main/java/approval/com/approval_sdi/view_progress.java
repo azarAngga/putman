@@ -5,12 +5,14 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -77,6 +79,8 @@ public class view_progress extends AppCompatActivity {
         Log.v("id_user",id_user+"d");
         Log.v("role",s_role+"d");
 
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
         nama_log            = (TextView)findViewById(R.id.nama);
         nama_pekerjaan_log  = (TextView)findViewById(R.id.nama_pekerjaan);
         keterangan_kerja    = (TextView)findViewById(R.id.keterangan);
@@ -118,6 +122,8 @@ public class view_progress extends AppCompatActivity {
                     String latitude = ob.getString("latitude");
                     String longitude = ob.getString("longitude");
                     String type = ob.getString("type");
+                    String name = ob.getString("name");
+                    String location = ob.getString("location");
 
                     hmString.put("id",id);
                     hmString.put("task",task);
@@ -127,6 +133,8 @@ public class view_progress extends AppCompatActivity {
                     hmString.put("latitude",latitude);
                     hmString.put("longitude",longitude);
                     hmString.put("type",type);
+                    hmString.put("name",name);
+                    hmString.put("location",location);
                     ahas2.add(hmString);
                 }
             }catch (Exception e){
@@ -164,14 +172,16 @@ public class view_progress extends AppCompatActivity {
 
     public void parsingDataLog() throws URISyntaxException {
 
-        String id  = null;
-        String task             = null;
-        String deskripsi           = null;
-        String url_name          = null;
-        String created_dtm          = null;
-        String latitude          = null;
-        String longitude          = null;
-        String type          = null;
+        String id           = null;
+        String task         = null;
+        String deskripsi    = null;
+        String url_name     = null;
+        String created_dtm  = null;
+        String latitude     = null;
+        String longitude    = null;
+        String type         = null;
+        String name         = null;
+        String location     = null;
 
         Log.v("ggggg","gggggggggg");
         for(HashMap<String,String> map :ahas2){
@@ -210,18 +220,28 @@ public class view_progress extends AppCompatActivity {
                 if(key.equals("type")){
                     type  = value;
                 }
+
+                if(key.equals("name")){
+                    name  = value;
+                }
+
+                if(key.equals("location")){
+                    location  = value;
+                }
             }
 
             LayoutInflater ln = (LayoutInflater)getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             View v = ln.inflate(R.layout.row_log,null);
             final TextView txt_task = (TextView)v.findViewById(R.id.txt_task);
             TextView txt_koordinat = (TextView)v.findViewById(R.id.txt_koordinat);
-            TextView txt_date = (TextView)v.findViewById(R.id.txt_tanggal);
+            final TextView txt_date = (TextView)v.findViewById(R.id.txt_tanggal);
+            final TextView txt_name = (TextView)v.findViewById(R.id.txt_name);
             final TextView txt_deskripsi = (TextView)v.findViewById(R.id.txt_deskripsi);
             Button btn_update = (Button)v.findViewById(R.id.button_update);
             Button btn_view_detil = (Button)v.findViewById(R.id.button_view_detil);
             final TextView txt_id = (TextView)v.findViewById(R.id.txt_id);
             final TextView header = (TextView)v.findViewById(R.id.header);
+            final TextView txt_location = (TextView)v.findViewById(R.id.txt_location);
 
             btn_update.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -233,10 +253,11 @@ public class view_progress extends AppCompatActivity {
             btn_view_detil.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    Intent in = new Intent(view_progress.this,detil_image_laporan.class);
-                    in.putExtra("task_id",txt_id.getText().toString());
+                    Intent in = new Intent(view_progress.this,detil_view_laporan.class);
+                    in.putExtra("id",txt_id.getText().toString());
                     in.putExtra("creator_id",id_user);
-                    in.putExtra("type",header.getText().toString());
+                    in.putExtra("date",txt_date.getText().toString());
+                    in.putExtra("is_done","1");
                     startActivity(in);
                 }
             });
@@ -245,22 +266,29 @@ public class view_progress extends AppCompatActivity {
             if(s_role.equals("1")){
                 btn_update.setVisibility(View.GONE);
             }
+            ImageView image_laporan = (ImageView)v.findViewById(R.id.image_laporan);
+            header.setBackgroundColor(getResources().getColor(R.color.colorPrimary));
 
             if(type.equals("PREVENTIVE")){
-                header.setBackgroundColor(getResources().getColor(R.color.blue));
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                    image_laporan.setImageDrawable(getDrawable(R.drawable.ic_mantenance_new));
+                }
             }else{
-                header.setBackgroundColor(getResources().getColor(R.color.green));
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                    image_laporan.setImageDrawable(getDrawable(R.drawable.ic_mantenance_new));
+                }
+
             }
 
-
-            ImageView image_laporan = (ImageView)v.findViewById(R.id.image_laporan);
-            Picasso.with(view_progress.this).load(url_name).into(image_laporan);
+            //Picasso.with(view_progress.this).load(url_name).into(image_laporan);
 
             //txt_type.setText(task);
             txt_koordinat.setText(latitude+","+longitude);
             txt_date.setText(created_dtm);
             nama_log.setText(task);
             txt_task.setText(task);
+            txt_name.setText(name);
+            txt_location.setText("["+location+"]");
             txt_id.setText(id);
             nama_pekerjaan_log.setText(deskripsi);
             txt_deskripsi.setText(deskripsi);
@@ -275,13 +303,15 @@ public class view_progress extends AppCompatActivity {
     public void prompt_task(String task,String id_task,String deskripsi){
         LayoutInflater li = LayoutInflater.from(view_progress.this);
         View promptsView = li.inflate(R.layout.task, null);
-//
+
         AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(view_progress.this);
         EditText nama_task           = (EditText)promptsView.findViewById(R.id.nama_task);
-        deskripsion_task    = (EditText)promptsView.findViewById(R.id.deskripsi_task);
-        EditText txt_id_task          = (EditText)promptsView.findViewById(R.id.id_task);
-        Button simpan               = (Button)promptsView.findViewById(R.id.simpan);
+        deskripsion_task             = (EditText)promptsView.findViewById(R.id.deskripsi_task);
+        EditText txt_id_task         = (EditText)promptsView.findViewById(R.id.id_task);
+        Button simpan                = (Button)promptsView.findViewById(R.id.simpan);
+        LinearLayout ln_vis          = (LinearLayout) promptsView.findViewById(R.id.ln_vis);
 
+        ln_vis.setVisibility(View.GONE);
         simpan.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -359,4 +389,9 @@ public class view_progress extends AppCompatActivity {
         }
     }
 
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        finish();
+        return super.onOptionsItemSelected(item);
+    }
 }

@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout
+    android:id="@+id/ln_"
     android:orientation="vertical"
     xmlns:android="http://schemas.android.com/apk/res/android" android:layout_width="match_parent"
     android:layout_height="match_parent">
@@ -28,6 +29,7 @@
                     android:layout_weight="0.4">
 
                     <ImageView
+                        android:id="@+id/img_v"
                         android:layout_width="100dp"
                         android:layout_height="100dp"
                         android:layout_margin="10dp"
@@ -95,6 +97,7 @@
                                 android:layout_gravity="center_vertical"
                                 android:layout_weight="1"
                                 android:textStyle="italic"
+                                android:id="@+id/status"
                                 android:text="View Detil"
                                 android:textSize="5pt" />
 
