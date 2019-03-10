@@ -88,7 +88,7 @@
             android:id="@+id/imageView1"
             android:layout_width="150dp"
             android:layout_height="150dp"
-            android:background="@drawable/report_new" />
+            android:background="@drawable/report_new4" />
     </RelativeLayout>
 
 </RelativeLayout>

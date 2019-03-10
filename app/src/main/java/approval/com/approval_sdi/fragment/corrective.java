@@ -9,31 +9,17 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.database.Cursor;
-import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.v4.widget.CursorAdapter;
-import android.support.v4.widget.SwipeRefreshLayout;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.ListAdapter;
-import android.widget.ListView;
-import android.widget.SimpleAdapter;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import org.json.JSONArray;
-import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
@@ -71,7 +57,6 @@ public class corrective extends android.support.v4.app.Fragment {
     public corrective(String s){
         // Required empty public constructor
         s_type = s;
-
     }
 
 
@@ -85,12 +70,12 @@ public class corrective extends android.support.v4.app.Fragment {
                              Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.list,container,false);
         listlinear = (LinearLayout)v.findViewById(R.id.list);
-        img_empty = (ImageView)v.findViewById(R.id.empty);
+        img_empty  = (ImageView)v.findViewById(R.id.empty);
         //Toast.makeText(getActivity(),s_,Toast.LENGTH_LONG).show();
         sharedPreferences = getActivity().getSharedPreferences(PREFER_NAME, Context.MODE_PRIVATE);
-        s_id_user = sharedPreferences.getString(KEY_USERNAME, null);
-        s_is_done = getActivity().getIntent().getStringExtra("is_done");
-        s_submit  = getActivity().getIntent().getStringExtra("submit");
+        s_id_user  = sharedPreferences.getString(KEY_USERNAME, null);
+        s_is_done  = getActivity().getIntent().getStringExtra("is_done");
+        s_submit   = getActivity().getIntent().getStringExtra("submit");
 
         new get_list().execute();
         return v;
@@ -165,14 +150,13 @@ public class corrective extends android.support.v4.app.Fragment {
                     if(key.equals("deskripsi")){
                         deskripsi  = value;
                     }
-
                 }
 
                 LayoutInflater ln = (LayoutInflater)getActivity().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
                 View v = ln.inflate(R.layout.row_corrective,null);
                 TextView txt_task            = (TextView)v.findViewById(R.id.task);
                 TextView txt_deskirpsi       = (TextView)v.findViewById(R.id.description);
-                final TextView txt_id_task         = (TextView)v.findViewById(R.id.id_task);
+                final TextView txt_id_task   = (TextView)v.findViewById(R.id.id_task);
                 final LinearLayout ln_    = (LinearLayout)v.findViewById(R.id.ln_);
 
 
@@ -189,17 +173,12 @@ public class corrective extends android.support.v4.app.Fragment {
                         in.putExtra("is_done",s_is_done);
                         in.putExtra("type",s_type);
                         startActivity(in);
-                        //getActivity().finish();
-
+                        getActivity().finish();
                     }
                 });
-
                 listlinear.addView(v);
-
             }
-
             pg.dismiss();
-
         }
     }
 

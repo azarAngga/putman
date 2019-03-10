@@ -104,9 +104,8 @@
                                   </option>
                                   <option name="values">
                                     <map>
-                                      <entry key="backgroundImage" value="$USER_HOME$/Downloads/report_new.png" />
+                                      <entry key="backgroundImage" value="$USER_HOME$/Downloads/report_new4.png" />
                                       <entry key="foregroundAssetType" value="TEXT" />
-                                      <entry key="generateWebIcon" value="false" />
                                       <entry key="showSafeZone" value="false" />
                                     </map>
                                   </option>

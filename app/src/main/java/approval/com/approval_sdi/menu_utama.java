@@ -30,7 +30,7 @@ public class menu_utama extends AppCompatActivity implements View.OnClickListene
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.menu_utama);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        //getSupportActionBar().setIcon(R.drawable.calendar_next_arrow);
         ctx = this;
 
         preventive = (ImageView) findViewById(R.id.preventive);
@@ -38,7 +38,6 @@ public class menu_utama extends AppCompatActivity implements View.OnClickListene
 
         preventive.setOnClickListener(this);
         corrective.setOnClickListener(this);
-
 
 //        try {
 //            Intent intent = new Intent(Intent.ACTION_VIEW);

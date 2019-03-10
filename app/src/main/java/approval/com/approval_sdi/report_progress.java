@@ -124,17 +124,42 @@ public class report_progress extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.call_droid);
         session 	= new UserSessionManager(getApplicationContext());
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         final SimpleDateFormat formatter = new SimpleDateFormat("dd MMM yyyy");
 
         caldroidFragment = new CaldroidFragment();
 
-        final Button all_task = (Button)findViewById(R.id.all_task);
+        final Button all_task   = (Button)findViewById(R.id.all_task);
+        final Button logout     = (Button)findViewById(R.id.logout);
+        final Button frame_management     = (Button)findViewById(R.id.frame_management);
+
         all_task.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent in = new Intent(report_progress.this,all_task.class);
                 startActivity(in);
+            }
+        });
+
+        logout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                finish();
+                session.logoutUser();
+                //Intent in = new Intent(report_progress.this,login.class);
+                //startActivity(in);
+
+            }
+        });
+
+        String role = session.pref.getString(KEY_ROLE,"0");
+        if(role.equals("3")){
+            frame_management.setVisibility(View.VISIBLE);
+        }
+
+        frame_management.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(getApplicationContext(), approval.com.approval_sdi.frame_management.class));
             }
         });
 

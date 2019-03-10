@@ -1,0 +1,237 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout
+    xmlns:android="http://schemas.android.com/apk/res/android" android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+    <android.support.v7.widget.CardView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <LinearLayout
+            android:padding="10dp"
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <LinearLayout
+                android:id="@+id/ln_vis"
+                android:orientation="vertical"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <TextView
+                    android:textStyle="bold"
+                    android:layout_gravity="center"
+                    android:text="Rute Baru"
+                    android:textSize="10pt"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
+
+                <TextView
+                    android:textStyle="bold"
+                    android:text="Category :"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
+
+                <RadioGroup
+                    android:id="@+id/rg_category"
+                    android:orientation="horizontal"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <RadioButton
+                        android:id="@+id/rb_preventive"
+                        android:checked="true"
+                        android:layout_weight="1"
+                        android:text="Preventive"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content" />
+
+                    <RadioButton
+                        android:id="@+id/rb_corrective"
+                        android:layout_weight="1"
+                        android:text="Corrective"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content" />
+
+                </RadioGroup>
+
+                <View
+                    android:background="#E6E6E6"
+                    android:layout_width="match_parent"
+                    android:layout_height="2dp" />
+
+                <TextView
+                    android:textStyle="bold"
+                    android:text="Nama Rute :"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
+
+                <EditText
+                    android:hint="isi disini..."
+                    android:id="@+id/nama_task"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" />
+
+                <TextView
+                    android:textStyle="bold"
+                    android:text="Nomor PO  :"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
+
+                <EditText
+                    android:hint="isi disini..."
+                    android:id="@+id/nomor_po"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" />
+
+                <TextView
+                    android:textStyle="bold"
+                    android:text="Date PO  :"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
+
+                <DatePicker
+                    android:layout_margin="10dp"
+                    android:id="@+id/date_po"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_horizontal"
+                    android:hint="isi disini..." />
+
+                <View
+                    android:background="#E6E6E6"
+                    android:layout_width="match_parent"
+                    android:layout_height="2dp" />
+                <LinearLayout
+                    android:padding="10dp"
+                    android:orientation="vertical"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <TextView
+                        android:textStyle="bold"
+                        android:text="Locations :"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content" />
+
+                    <LinearLayout
+                        android:id="@+id/rg_ring"
+                        android:orientation="vertical"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content">
+
+                        <RadioButton
+                            android:checked="true"
+                            android:id="@+id/ring_1"
+                            android:text="Ring 1"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content" />
+
+                        <RadioButton
+                            android:id="@+id/ring_2"
+                            android:text="Ring 2"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content" />
+
+                        <LinearLayout
+                            android:orientation="horizontal"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content">
+
+
+                            <RadioButton
+
+                                android:layout_weight="1"
+                                android:id="@+id/ring_other"
+                                android:text="Ring Other"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content" />
+
+                            <EditText
+                                android:hint="other"
+                                android:visibility="gone"
+                                android:id="@+id/other"
+                                android:layout_weight="5"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content" />
+
+                        </LinearLayout>
+
+
+                    </LinearLayout>
+
+                    <View
+                        android:background="#afafaf"
+                        android:layout_width="match_parent"
+                        android:layout_height="2dp"/>x
+
+                </LinearLayout>
+
+                <EditText
+                    android:visibility="gone"
+                    android:id="@+id/id_task"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" />
+
+
+            </LinearLayout>
+
+            <TextView
+                android:textStyle="bold"
+                android:text="Deskripsi :"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+
+            <EditText
+                android:hint="isi disini..."
+                android:id="@+id/deskripsi_task"
+                android:layout_width="match_parent"
+                android:layout_height="150dp"
+                android:inputType="text|textMultiLine"
+                android:gravity="top"/>
+
+            <Button
+                android:textStyle="bold"
+                android:textColor="@color/white"
+                android:background="@color/colorPrimaryDark"
+                android:onClick="simpanTask"
+                android:text="Simpan Rute Baru"
+                android:id="@+id/simpan"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
+            <TextView
+                android:layout_marginTop="20dp"
+                android:textStyle="bold"
+                android:layout_gravity="center"
+                android:text="List Rute"
+                android:textSize="10pt"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+
+            <View
+                android:background="#0E0E55"
+                android:layout_width="match_parent"
+                android:layout_height="3dp"/>
+
+                <LinearLayout
+                    android:id="@+id/ln_task"
+                    android:orientation="vertical"
+                    android:layout_width="match_parent"
+                    android:layout_height="100dp">
+
+                </LinearLayout>
+
+
+        </LinearLayout>
+
+    </android.support.v7.widget.CardView>
+
+    </ScrollView>
+
+</FrameLayout>

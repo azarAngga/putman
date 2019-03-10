@@ -1,0 +1,155 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" >
+
+
+        <RelativeLayout
+            android:layout_marginBottom="0dp"
+            android:layout_above="@+id/ln"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <TextView
+                android:textStyle="bold"
+                android:textSize="12pt"
+                android:gravity="center_horizontal"
+                android:text="User baru"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:layout_centerHorizontal="true"
+            android:id="@+id/ln"
+            android:gravity="center_horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:padding="5dp">
+
+            <android.support.v7.widget.CardView
+                android:background="#eaeaea"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <LinearLayout
+                    android:layout_margin="10dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_horizontal"
+                    android:orientation="vertical">
+
+                    <EditText
+                        android:id="@+id/e_nama"
+                        android:layout_width="300dp"
+                        android:layout_height="50dp"
+                        android:layout_centerHorizontal="true"
+                        android:hint="Nama"
+                        android:paddingLeft="0dp"
+                        android:paddingRight="0dp" />
+
+                    <EditText
+                        android:id="@+id/e_username"
+                        android:layout_width="300dp"
+                        android:layout_height="50dp"
+                        android:layout_centerHorizontal="true"
+                        android:hint="Username"
+                        android:paddingLeft="0dp"
+                        android:paddingRight="0dp" />
+
+                    <EditText
+                        android:id="@+id/e_password"
+                        android:layout_width="300dp"
+                        android:layout_height="50dp"
+                        android:layout_below="@id/e_username"
+                        android:layout_centerHorizontal="true"
+                        android:hint="Password"
+                        android:paddingLeft="0dp"
+                        android:password="true" />
+
+                    <EditText
+                        android:id="@+id/e_re_password"
+                        android:layout_width="300dp"
+                        android:layout_height="50dp"
+                        android:hint="Re-Password"
+                        android:paddingLeft="0dp"
+                        android:password="true" />
+
+
+                    <TextView
+                        android:layout_marginLeft="35dp"
+                        android:layout_gravity="left"
+                        android:text="Role: "
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content" />
+
+
+                    <Spinner
+                        android:id="@+id/sp_role"
+                        android:layout_marginLeft="30dp"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"></Spinner>
+
+                    <EditText
+                        android:id="@+id/ed_number"
+                        android:layout_width="300dp"
+                        android:layout_height="50dp"
+                        android:layout_centerHorizontal="true"
+                        android:enabled="false"
+                        android:hint="Nomor"
+                        android:paddingRight="14dp"
+                        android:visibility="gone" />
+
+                    <Button
+                        android:layout_margin="20dp"
+                        android:id="@+id/btn_submit"
+                        android:layout_width="300dp"
+                        android:layout_height="wrap_content"
+                        android:layout_alignLeft="@+id/ed_password"
+                        android:layout_alignStart="@+id/ed_password"
+                        android:layout_below="@+id/ed_password"
+                        android:layout_marginTop="50dp"
+                        android:background="@color/colorPrimaryDark"
+                        android:text="submit"
+                        android:textColor="#ffffff"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:layout_marginTop="20dp"
+                        android:textStyle="bold"
+                        android:layout_gravity="center"
+                        android:text="List User"
+                        android:textSize="10pt"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content" />
+
+                    <View
+                        android:background="#0E0E55"
+                        android:layout_width="match_parent"
+                        android:layout_height="3dp"/>
+
+                        <LinearLayout
+                            android:id="@+id/ln_user"
+                            android:orientation="vertical"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent">
+
+                        </LinearLayout>
+
+
+                </LinearLayout>
+
+            </android.support.v7.widget.CardView>
+
+        </RelativeLayout>
+
+    </LinearLayout>
+
+</ScrollView>

@@ -7,7 +7,9 @@ import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.res.Resources;
+import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
@@ -22,7 +24,9 @@ import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.TextView;
@@ -39,6 +43,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
@@ -53,22 +58,30 @@ public class detil_view_laporan extends AppCompatActivity implements RadioGroup.
 
     private ViewPager viewPager;
     private RadioGroup group;
+    int posisi_image;
     ArrayList<HashMap<String,String>> ahas = new ArrayList<HashMap<String,String>>();
     api api = new api();
     ProgressDialog pg;
     String message = null;
     Context ctx;
-    Button submit,excel;
+    Button submit,excel,update,delete;
     String s_id ;
     String s_submit ;
     String s_is_done;
     String s_type;
+    String s_id_user;
+    EditText e_deskripsi;
     String s_date_parse;
     ArrayList<String> ar = new ArrayList<>();
     ImageSliderAdapter adapter;
+    SharedPreferences pref;
+    ImageView delete_img;
+    LinearLayout ln_settings;
 
     TextView t_task_name,t_category,t_location,t_date,t_deskripsi;
     private Context context;
+    int PRIVATE_MODE = 0;
+    UserSessionManager session;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -77,8 +90,10 @@ public class detil_view_laporan extends AppCompatActivity implements RadioGroup.
 
         ctx  = this;
         context = this;
+        pref = getSharedPreferences("AndroidExamplePref", 0);
 
         viewPager   = (ViewPager)findViewById(R.id.image_slider);
+        delete_img  = (ImageView)findViewById(R.id.delete_img);
         group       = (RadioGroup)findViewById(R.id.slider_indicator_group);
 
         Intent in = getIntent();
@@ -89,6 +104,8 @@ public class detil_view_laporan extends AppCompatActivity implements RadioGroup.
         s_type      = in.getStringExtra("type"); // untuk user
         s_date      = in.getStringExtra("date");
 
+        session 	= new UserSessionManager(getApplicationContext());
+        s_id_user = session.pref.getString("username",null);
 
         try{
             if(s_date.equals("")){
@@ -102,14 +119,18 @@ public class detil_view_laporan extends AppCompatActivity implements RadioGroup.
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-        t_task_name      = (TextView) findViewById(R.id.task);
-        t_category       = (TextView) findViewById(R.id.category);
-        t_location       = (TextView) findViewById(R.id.location);
-        t_deskripsi      = (TextView) findViewById(R.id.deskripsi);
-        t_date           = (TextView) findViewById(R.id.tanggal);
-        t_category       = (TextView) findViewById(R.id.category);
-        submit           = (Button) findViewById(R.id.submit);
-        excel            = (Button) findViewById(R.id.excel);
+        t_task_name      = (TextView)findViewById(R.id.task);
+        t_category       = (TextView)findViewById(R.id.category);
+        t_location       = (TextView)findViewById(R.id.location);
+        t_deskripsi      = (TextView)findViewById(R.id.deskripsi);
+        e_deskripsi      = (EditText)findViewById(R.id.txt_desk);
+        t_date           = (TextView)findViewById(R.id.tanggal);
+        t_category       = (TextView)findViewById(R.id.category);
+        submit           = (Button)findViewById(R.id.submit);
+        excel            = (Button)findViewById(R.id.excel);
+        update            = (Button)findViewById(R.id.update_deskripsi);
+        delete            = (Button)findViewById(R.id.delete);
+        ln_settings      = (LinearLayout) findViewById(R.id.ln_settings);
         img_category     = (ImageView)findViewById(R.id.img_category);
 
         excel.setOnClickListener(new View.OnClickListener() {
@@ -118,21 +139,65 @@ public class detil_view_laporan extends AppCompatActivity implements RadioGroup.
                 new generateExcel().execute();
             }
         });
+        update.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                popup();
+            }
+        });
+
+        ColorDrawable grey = new ColorDrawable(getResources().getColor(R.color.grey));
+
+        String role = pref.getString("role","");
+        Log.v("role",role);
+        if(role.equals("3")){
+            e_deskripsi.setVisibility(View.VISIBLE);
+            t_deskripsi.setVisibility(View.GONE);
+            update.setVisibility(View.VISIBLE);
+            ln_settings.setVisibility(View.GONE);
+
+        }else if(role.equals("2")){
+            delete_img.setVisibility(View.GONE);
+            delete.setEnabled(false);
+            delete.setBackground(grey);
+        }else{
+
+
+            delete_img.setVisibility(View.GONE);
+            delete.setEnabled(false);
+            delete.setBackground(grey);
+
+
+        }
 
 
         if(s_is_done.equals("1")){
-                submit.setVisibility(View.GONE);
+                submit.setEnabled(false);
+                submit.setBackground(grey);
         }
 
         submit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                doneTask();
+                doneTask("1");
+            }
+        });
+        delete.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                doneTask("-1");
             }
         });
 
         group.setOnCheckedChangeListener(this);
         viewPager.addOnPageChangeListener(this);
+
+        delete_img.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                popupDelete();
+            }
+        });
 
         adapter = new ImageSliderAdapter(getSupportFragmentManager());
         new getData().execute();
@@ -164,6 +229,7 @@ public class detil_view_laporan extends AppCompatActivity implements RadioGroup.
         int radioButtonId = group.getChildAt(position).getId();
         group.check(radioButtonId);
         t_date.setText(ar.get(position));
+        posisi_image = position;
         Log.v("urutan",String.valueOf(position));
     }
 
@@ -172,6 +238,7 @@ public class detil_view_laporan extends AppCompatActivity implements RadioGroup.
     String s_message = null;
     JSONArray jsArray;
     JSONArray ar_date;
+    JSONArray ar_id;
     ImageView img_category;
     String s_status = "";
     String s_task_name,s_date,s_deskripsi,s_location,s_category;
@@ -211,6 +278,8 @@ public class detil_view_laporan extends AppCompatActivity implements RadioGroup.
                 s_location  = object.getString("location");
                 s_category  = object.getString("category");
                 ar_date     = object.getJSONArray("date");
+                ar_id       = object.getJSONArray("id");
+
             } catch (JSONException e) {
                 Log.v("tdk","blm ada kegiatan");
                 s_message = "belum ada kegiatan";
@@ -263,6 +332,7 @@ public class detil_view_laporan extends AppCompatActivity implements RadioGroup.
                     for(int in = 0;in<for_img.length();in++){
                         JSONObject ob = for_radio.getJSONObject(in);
                         ar.add(ar_date.getString(in));
+
                         Log.v("url img",String.valueOf(ob.getString("url")));
                         Log.v("nilai in",String.valueOf(in));
                         adapter.addFragment(ImageSliderFragment.newInstance(ob.getString("url")));
@@ -276,6 +346,7 @@ public class detil_view_laporan extends AppCompatActivity implements RadioGroup.
                     t_deskripsi.setText(s_deskripsi);
                     t_location.setText(s_location);
                     t_category.setText(s_category);
+                    e_deskripsi.setText(s_deskripsi);
 
 
                 }else{
@@ -311,8 +382,8 @@ public class detil_view_laporan extends AppCompatActivity implements RadioGroup.
             try{
                 JSONParser jsParser  = new JSONParser();
 
-                JSONObject object = jsParser.AmbilJson(api.url+"excel/Examples/simple.php?id="+S_id+"&date="+S_date);
-                Log.v("url",api.url+"excel/Examples/simple.php?id="+S_id+"&date="+S_date);
+                JSONObject object = jsParser.AmbilJson(api.url+"excel/Examples/simplev2.php?id="+S_id+"&date="+S_date);
+                Log.v("url",api.url+"excel/Examples/simplev2.php?id="+S_id+"&date="+S_date);
 
                 s_url    = object.getString("url");
                 Log.v("urlz",s_url);
@@ -345,10 +416,21 @@ public class detil_view_laporan extends AppCompatActivity implements RadioGroup.
         }
     }
 
-    public void doneTask(){
+    String s_status_update;
+    public void doneTask(String status){
         final AlertDialog.Builder builder = new AlertDialog.Builder(ctx);
         builder.setCancelable(false);
-        builder.setMessage("Apakah anda yakin menyelesaikan task ini?");
+        String s,d;
+        s_status_update = status;
+        if(status.equals("1")){
+            s = "Apakah anda yakin menyelesaikan Rute ini?";
+            d = "Perhatian!!!";
+        }else{
+            s = "Apakah anda yakin untuk menghapus Rute ini?";
+            d = "Persetujuan?";
+        }
+        builder.setTitle(d);
+        builder.setMessage(s);
         builder.setPositiveButton("Ya", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
@@ -384,7 +466,7 @@ public class detil_view_laporan extends AppCompatActivity implements RadioGroup.
 
             try{
                 JSONParser jsParser  = new JSONParser();
-                JSONObject object = jsParser.AmbilJson(api.url+"update_done_task.php?id="+s_id);
+                JSONObject object = jsParser.AmbilJson(api.url+"update_done_task.php?id="+s_id+"&is_done="+s_status_update+"&id_user="+s_id_user);
                 String status = "";
                 status = object.getString("status");
                 status_put_task = status;
@@ -536,7 +618,7 @@ public class detil_view_laporan extends AppCompatActivity implements RadioGroup.
                 try {
                     Intent intent = new Intent(Intent.ACTION_VIEW);
                     intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                    File f = new File("/mnt/sdcard/"+g[8]);
+                    File f = new File("/mnt/sdcard/reportku/"+g[8]);
 
                     Uri uri = null;
 
@@ -561,6 +643,134 @@ public class detil_view_laporan extends AppCompatActivity implements RadioGroup.
             }
 
         }
+    }
+
+    private class update_task extends AsyncTask<Void,Void,String[]> {
+
+        @Override
+        protected String[] doInBackground(Void... voids) {
+            String deskripsi_parse = null;
+            try {
+                deskripsi_parse = URLEncoder.encode(e_deskripsi.getText().toString(),"utf-8");
+            } catch (UnsupportedEncodingException e) {
+
+            }catch (Exception e){
+
+            }
+
+            try{
+                JSONParser jsParser  = new JSONParser();
+                JSONObject object = null;
+                object = jsParser.AmbilJson(api.url+"update_task.php?deskripsi="+deskripsi_parse+"&id="+s_id);
+                Log.v("xxx",api.url+"update_task.php?deskripsi="+deskripsi_parse+"&id="+s_id);
+                message = object.getString("message");
+                s_status = object.getString("status");
+            }catch (Exception e){
+                Log.v("tidak","tidak");
+                message = String.valueOf(e);
+            }
+            return new String[0];
+        }
+
+        @Override
+        protected void onPreExecute() {
+            pg = new ProgressDialog(detil_view_laporan.this);
+            pg.setMessage("Please Wait...");
+            pg.setCancelable(false);
+            pg.show();
+            super.onPreExecute();
+        }
+
+        @Override
+        protected void onPostExecute(String[] strings) {
+            super.onPostExecute(strings);
+            Toast.makeText(detil_view_laporan.this,message,Toast.LENGTH_LONG).show();
+            pg.dismiss();
+
+        }
+    }
+
+    private class delete_img extends AsyncTask<Void,Void,String[]> {
+
+        @Override
+        protected String[] doInBackground(Void... voids) {
+            String id_image = null;
+            try {
+                id_image = URLEncoder.encode(ar_id.getString(posisi_image),"utf-8");
+            } catch (UnsupportedEncodingException e) {
+
+            }catch (Exception e){
+
+            }
+
+            try{
+                JSONParser jsParser  = new JSONParser();
+                JSONObject object = null;
+                object = jsParser.AmbilJson(api.url+"delete_gambar.php?id_image="+id_image);
+                Log.v("xxx",api.url+"delete_gambar.php?id_image="+id_image);
+                message = object.getString("message");
+                s_status = object.getString("status");
+            }catch (Exception e){
+                Log.v("tidak","tidak");
+                message = String.valueOf(e);
+            }
+            return new String[0];
+        }
+
+        @Override
+        protected void onPreExecute() {
+            pg = new ProgressDialog(detil_view_laporan.this);
+            pg.setMessage("Please Wait...");
+            pg.setCancelable(false);
+            pg.show();
+            super.onPreExecute();
+        }
+
+        @Override
+        protected void onPostExecute(String[] strings) {
+            super.onPostExecute(strings);
+            Toast.makeText(detil_view_laporan.this,message,Toast.LENGTH_LONG).show();
+            pg.dismiss();
+
+        }
+    }
+
+    public void  popup(){
+        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(detil_view_laporan.this);
+        alertDialogBuilder.setMessage("apakah anda yakin akan update deskripsi?");
+        alertDialogBuilder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                new update_task().execute();
+            }
+        });
+        alertDialogBuilder.setNegativeButton("no", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+
+            }
+        });
+
+        alertDialogBuilder.show();
+    }
+
+    public void  popupDelete(){
+        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(detil_view_laporan.this);
+        alertDialogBuilder.setMessage("apakah anda yakin akan Delete gambar ini?");
+        alertDialogBuilder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                new delete_img().execute();
+            }
+        });
+        alertDialogBuilder.setNegativeButton("no", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+
+            }
+        });
+
+        alertDialogBuilder.show();
     }
 
 }

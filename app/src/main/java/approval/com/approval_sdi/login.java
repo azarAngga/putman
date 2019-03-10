@@ -157,35 +157,15 @@ public class login extends Activity{
                         Log.v("texx",role_id);
                         Intent i = null;
                         createDir();
-                        i = new Intent(login.this, menu_role.class);
+                        if(role_id.trim().equals("2")){
+
+                            i = new Intent(login.this, menu_utama.class);
+
+                        }else{
+                            i = new Intent(login.this, report_progress.class);
+                        }
                         startActivity(i);
                         finish();
-                        /*if(role_id.trim().equals("3")){
-                            Intent i = null;
-                            i = new Intent(login.this, menu_utama.class);
-                            startActivity(i);
-                        }else{
-                            Intent i = null;
-                            i = new Intent(login.this, report_progress.class);
-                            startActivity(i);
-                        }*/
-
-                        /*Intent i = null;
-
-
-                        if(a[3].equals("1")){
-                            i = new Intent(login.this, report_progress.class);
-                            Log.v("ini","ggg"+a[1]+":sss"+a[2]+":Dfdfdf"+a[3]);
-
-                        }if(a[3].equals("2")){
-                            i = new Intent(login.this, report_progress.class);
-                        }else{
-                            i = new Intent(login.this, progress_order.class);
-                        }
-                        i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                        i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                        startActivity(i);
-                        finish();*/
                     }else if(status.equals("9")){
                         Intent i = new Intent(login.this,MainActivity.class);
                         startActivity(i);
@@ -206,7 +186,7 @@ public class login extends Activity{
 
         session = new UserSessionManager(getApplicationContext());
         sharedPreferences = getSharedPreferences(PREFER_NAME,Context.MODE_PRIVATE);
-        String islogin = sharedPreferences.getString(KEY_USERNAME, "");
+        //String islogin = sharedPreferences.getString(KEY_USERNAME, "");
         if(session.checkLogin(login.this)){
             finish();
         }

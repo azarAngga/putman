@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android" android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <LinearLayout
+        android:id="@+id/row"
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <TableLayout
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:stretchColumns="1">
+
+            <TableRow>
+
+                <FrameLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="0.2">
+
+                    <ImageView
+                        android:layout_width="50dp"
+                        android:layout_height="50dp"
+                        android:layout_margin="10dp"
+                        android:layout_weight="1"
+                        android:src="@drawable/icon_task" />
+
+                </FrameLayout>
+
+                <FrameLayout
+                    android:layout_height="match_parent"
+                    android:layout_width="0dp"
+                    android:layout_weight="1">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:orientation="vertical">
+
+                        <View
+                            android:layout_width="match_parent"
+                            android:layout_height="2dp"
+                            android:background="#eaeaea" />
+
+
+                        <RelativeLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent">
+
+                            <TextView
+                                android:layout_centerVertical="true"
+                                android:gravity="center_vertical"
+                                android:id="@+id/nama_task"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_gravity="center_vertical"
+                                android:layout_weight="1"
+                                android:text="nama"
+                                android:textSize="9pt" />
+
+                            <TextView
+                                android:visibility="gone"
+                                android:layout_centerVertical="true"
+                                android:gravity="center_vertical"
+                                android:id="@+id/id_task"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_gravity="center_vertical"
+                                android:layout_weight="1"
+                                android:text="nama"
+                                android:textSize="9pt" />
+
+
+                            <ImageView
+                                android:layout_toLeftOf="@+id/delete_usr"
+                                android:id="@+id/update"
+                                android:layout_centerVertical="true"
+                                android:src="@drawable/update"
+                                android:layout_width="30dp"
+                                android:layout_height="30dp" />
+
+                            <ImageView
+                                android:id="@+id/delete_usr"
+                                android:layout_centerVertical="true"
+                                android:layout_alignParentRight="true"
+                                android:src="@drawable/delete"
+                                android:layout_width="50dp"
+                                android:layout_height="50dp" />
+
+                        </RelativeLayout>
+
+
+                        <TextView
+                            android:id="@+id/nama_pesanan"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center_vertical"
+                            android:layout_weight="1"
+                            android:text="Nama Pemesan"
+                            android:textSize="9pt"
+                            android:visibility="gone" />
+
+                    </LinearLayout>
+
+                </FrameLayout>
+
+            </TableRow>
+
+        </TableLayout>
+
+        <View
+            android:background="#eaeaea"
+            android:layout_width="match_parent"
+            android:layout_height="3dp" />
+
+    </LinearLayout>
+
+</RelativeLayout>

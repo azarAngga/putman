@@ -22,6 +22,7 @@ import android.location.LocationManager;
 import android.media.ExifInterface;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.NetworkOnMainThreadException;
@@ -103,6 +104,7 @@ import static android.provider.MediaStore.Files.FileColumns.MEDIA_TYPE_IMAGE;
 public class progress_order extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener,OnMapReadyCallback, View.OnClickListener {
 
+    LocationManager locationManager;
     public static int MY_PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION = 1;
     public static int MY_PERMISSIONS_REQUEST_STORAGE = 2;
     public static final int REQUEST_IMAGE = 100;
@@ -158,7 +160,8 @@ public class progress_order extends AppCompatActivity
     String id_creator ="1";
     modelData model;
     String s_type = null;
-    String s_address = "-";
+    String s_address = "";
+    EditText e_address;
 
 
     @Override
@@ -194,6 +197,8 @@ public class progress_order extends AppCompatActivity
         loadMap();
         getgps();
         loadElement();
+
+
 
         currentDateandTime = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date());
         sharedPreferences = getSharedPreferences(PREFER_NAME,Context.MODE_PRIVATE);
@@ -238,11 +243,15 @@ public class progress_order extends AppCompatActivity
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         if(s_type.equals("1")){
-            window.setStatusBarColor(ContextCompat.getColor(this,R.color.colorPrimary));
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                window.setStatusBarColor(ContextCompat.getColor(this,R.color.colorPrimary));
+            }
             toolbar.setBackgroundColor(Color.parseColor("#159afc"));
             toolbar.setTitle("Preventive");
         }else{
-            window.setStatusBarColor(ContextCompat.getColor(this,R.color.colorPrimary));
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                window.setStatusBarColor(ContextCompat.getColor(this,R.color.colorPrimary));
+            }
             toolbar.setBackgroundColor(Color.parseColor("#159afc"));
             toolbar.setTitle("Corrective");
         }
@@ -262,6 +271,7 @@ public class progress_order extends AppCompatActivity
                         .setAction("Action", null).show();
             }
         });
+
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
@@ -288,12 +298,14 @@ public class progress_order extends AppCompatActivity
             navigationView.inflateMenu(R.menu.activity_main_drawer);
         }
         navigationView.setNavigationItemSelectedListener(this);
+
+        gpsManager();
     }
 
     private void loadElement() {
         task =  (Spinner)findViewById(R.id.task);
         img =  (ImageView)findViewById(R.id.img);
-        address  = (TextView)findViewById(R.id.address);
+        e_address  = (EditText)findViewById(R.id.address);
 
         //load_map =  (ImageView)findViewById(R.id.load_map);
         BitmapFactory.Options options = new BitmapFactory.Options();
@@ -396,6 +408,8 @@ public class progress_order extends AppCompatActivity
 
     }
 
+
+
     private class getTask extends AsyncTask<Void,Void,String[]> {
 
         @Override
@@ -412,7 +426,7 @@ public class progress_order extends AppCompatActivity
                 Log.v("isi",String.valueOf(object));
 
                 id_task.add("0");
-                task_name.add("--Task--");
+                task_name.add("--Rute--");
 
                 if(status.equals("T")){
                     jsArray = object.getJSONArray("data");
@@ -461,6 +475,7 @@ public class progress_order extends AppCompatActivity
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 s_task_id = id_task.get(position);
+                //Toast.makeText(progress_order.this,s_task_id,Toast.LENGTH_LONG).show();
 
             }
 
@@ -621,6 +636,8 @@ public class progress_order extends AppCompatActivity
     }
 
     RelativeLayout ln;
+    String txt_prompt_latitude;
+    String txt_prompt_longi;
     public void promptImage(){
         //new putProgress().execute();
         LayoutInflater li = LayoutInflater.from(progress_order.this);
@@ -644,16 +661,23 @@ public class progress_order extends AppCompatActivity
 
         Bitmap myBitmap = BitmapFactory.decodeFile(imageFilePath,options);
         foto.setImageBitmap(myBitmap);
-        foto.setRotation(90);
+        if(String.valueOf(s_rotasi.replace("Orientation","").replace(":","")).trim().equals("3")){
+            foto.setRotation(180);
+        }
+        //foto.setRotation(90);
 
-        foto.setImageBitmap(Bitmap.createScaledBitmap(myBitmap, 3000, 2000, false));
+        //foto.setImageBitmap(Bitmap.createScaledBitmap(myBitmap, 3000, 2000, false));
+        img.setImageBitmap(Bitmap.createScaledBitmap(myBitmap, 2000, 800, false));
 
         map.setImageBitmap(BitmapFactory.decodeFile(Environment.getExternalStorageDirectory().getAbsolutePath()+"/vendor/capture_map.jpg"));
-        address.setText(s_address);
-        map.setAlpha(150);
-        latitude.setText(s_latitude);
-        longitude.setText(s_longitude);
+        address.setText(e_address.getText().toString());
+        map.setAlpha(180);
 
+        latitude.setText(" "+s_latitude);
+        longitude.setText(" "+s_longitude);
+
+        txt_prompt_latitude  = s_latitude;
+        txt_prompt_longi     = s_longitude;
 
         // set dialog message
         alertDialogBuilder
@@ -879,13 +903,26 @@ public class progress_order extends AppCompatActivity
     }
 
     public void submit(){
-        if(s_task_id.equals("0")){
-            Toast.makeText(progress_order.this,"Pilih Task terlebih dahulu, jika task belum ada klik tombol 'Create New Task'",Toast.LENGTH_LONG).show();
-        }else if(is_capture){
-            promptImage();
-        }else{
-            Toast.makeText(progress_order.this,"Ambil Foto Terlebih Dahulu",Toast.LENGTH_LONG).show();
+        try{
+
+            Log.v("orientasi",String.valueOf(s_rotasi.replace("Orientation","").replace(":","").replace(" ","")));
+            if(s_task_id.equals("0")) {
+                Toast.makeText(progress_order.this,"Pilih Rute terlebih dahulu, jika Rute belum ada klik tombol 'Buat Rute Baru'",Toast.LENGTH_LONG).show();
+            }else if(e_address.getText().toString().equals("")){
+                Toast.makeText(progress_order.this,"Alamat kosong, isi alamat terlebih dahulu",Toast.LENGTH_LONG).show();
+            }else if(!String.valueOf(s_rotasi.replace("Orientation","").replace(":","")).trim().equals("1") && !String.valueOf(s_rotasi.replace("Orientation","").replace(":","")).trim().equals("3")){
+                Toast.makeText(progress_order.this,"Terdeteksi hasil kamera tidak landscape dengan benar, gunakan landscape untuk hasil foto",Toast.LENGTH_LONG).show();
+            }else if(!is_capture){
+                Toast.makeText(progress_order.this,"Ambil Foto Terlebih Dahulu",Toast.LENGTH_LONG).show();
+            }else{
+                promptImage();
+            }
+
+        }catch (Exception e){
+            Toast.makeText(progress_order.this,"Ambil Foto terlebih dahulu",Toast.LENGTH_LONG).show();
+
         }
+
     }
 
 
@@ -930,14 +967,39 @@ public class progress_order extends AppCompatActivity
             if (resultCode == RESULT_OK) {
                 //img.setImageURI(Uri.parse(imageFilePath));
 
+                try {
+                    ExifInterface exif = new ExifInterface(imageFilePath);
+                    ShowExif(exif);
+
+
+                } catch (IOException e) {
+                    Log.v("long",String.valueOf(e));
+                    Toast.makeText(this, "Error!", Toast.LENGTH_LONG).show();
+                }
+
+
+
                 final BitmapFactory.Options options = new BitmapFactory.Options();
                 options.inSampleSize = 8;
 
                 Bitmap myBitmap = BitmapFactory.decodeFile(imageFilePath,options);
                 img.setImageBitmap(myBitmap);
-                img.setRotation(90);
-                img.setImageBitmap(Bitmap.createScaledBitmap(myBitmap, 1600, 1200, false));
+                //dis
+                img.setRotation(0);
+                img.setImageBitmap(Bitmap.createScaledBitmap(myBitmap, 1600, 900, false));
                 is_capture = true;
+                if(String.valueOf(s_rotasi.replace("Orientation","").replace(":","")).trim().equals("3")){
+                    img.setRotation(180);
+                }else if(String.valueOf(s_rotasi.replace("Orientation","").replace(":","")).trim().equals("6")){
+                    img.setRotation(90);
+                }else if(String.valueOf(s_rotasi.replace("Orientation","").replace(":","")).trim().equals("8")){
+                    img.setRotation(-90);
+                }
+                int finalHeight = img.getMeasuredHeight();
+                int finalWidth = img.getMeasuredWidth();
+
+                Log.v("height", String.valueOf(finalHeight));
+                Log.v("widt", String.valueOf(finalWidth));
             }
             else if (resultCode == RESULT_CANCELED) {
                 Toast.makeText(this, "You cancelled the operation", Toast.LENGTH_SHORT).show();
@@ -1090,8 +1152,14 @@ public class progress_order extends AppCompatActivity
     String s_longitude;
     public void showCurrentLocation(){
         //if (gps != null) {
-            s_latitude  = String.valueOf(gps.getLatitude());
-            s_longitude = String.valueOf(gps.getLongitude());
+
+            try{
+                s_latitude  = String.valueOf(gps.getLatitude()).substring(0, 10);
+                s_longitude = String.valueOf(gps.getLongitude()).substring(0, 10);
+            }catch (Exception e){
+                s_latitude  = String.valueOf(gps.getLatitude());
+                s_longitude = String.valueOf(gps.getLongitude());
+            }
             Log.v("latitde1",s_latitude+"xxx"+String.valueOf(gps.getLatitude()));
             //Toast.makeText(getApplicationContext(),s_latitude,Toast.LENGTH_LONG).show();
         //}else{
@@ -1108,9 +1176,18 @@ public class progress_order extends AppCompatActivity
     }
 
     public void showCurrentLocation2(){
-        //if (gps != null) {
-        s_latitude  = String.valueOf(gps.getLatitude());
-        s_longitude = String.valueOf(gps.getLongitude());
+
+        try{
+            s_latitude  = String.valueOf(gps.getLatitude()).substring(0, 10);
+            s_longitude = String.valueOf(gps.getLongitude()).substring(0, 10);
+
+        }catch (Exception e){
+
+            s_latitude  = String.valueOf(gps.getLatitude());
+            s_longitude = String.valueOf(gps.getLongitude());
+
+        }
+
         Log.v("latitde1",s_latitude+"xxx"+String.valueOf(gps.getLatitude()));
         int PERMISSION_ALL = 1;
         String[] PERMISSIONS = {
@@ -1187,8 +1264,17 @@ public class progress_order extends AppCompatActivity
             if(location != null){
                 double latitude = location.getLatitude();
                 double longitude = location.getLongitude();
-                s_latitude 	= String.valueOf(latitude);
-                s_longitude = String.valueOf(longitude);
+                try{
+                    s_latitude 	= String.valueOf(latitude).substring(0, 10);
+                    s_longitude = String.valueOf(longitude).substring(0, 10);
+
+                }catch (Exception e){
+
+                    s_latitude 	= String.valueOf(latitude);
+                    s_longitude = String.valueOf(longitude);
+
+                }
+
                 Log.v("latitde2",s_latitude);
             }else{
                 s_latitude 	= String.valueOf("-6.209274");
@@ -1224,8 +1310,15 @@ public class progress_order extends AppCompatActivity
             if(location != null){
                 double latitude = location.getLatitude();
                 double longitude = location.getLongitude();
-                s_latitude 	= String.valueOf(latitude);
-                s_longitude = String.valueOf(longitude);
+                try{
+                    s_latitude 	= String.valueOf(latitude).substring(0, 10);
+                    s_longitude = String.valueOf(longitude).substring(0, 10);
+
+                }catch (Exception e){
+                    s_latitude 	= String.valueOf(latitude);
+                    s_longitude = String.valueOf(longitude);
+                }
+
                 Log.v("latitde2",s_latitude);
             }else{
                 s_latitude 	= String.valueOf("-6.209274");
@@ -1480,6 +1573,15 @@ public class progress_order extends AppCompatActivity
             double latitude = gps2.getLatitude();
             double longitude = gps2.getLongitude();
 
+            try {
+                s_latitude = String.valueOf(latitude).substring(0, 10);
+                s_latitude = String.valueOf(longitude).substring(0, 10);
+            }catch (Exception e){
+                s_latitude = String.valueOf(latitude);
+                s_latitude = String.valueOf(longitude);
+            }
+
+
             // \n is for new line
             //Toast.makeText(getApplicationContext(), "Your Location is - \nLat: " + latitude + "\nLong: " + longitude, Toast.LENGTH_LONG).show();
         }else{
@@ -1492,6 +1594,7 @@ public class progress_order extends AppCompatActivity
 
     String status_put_task = null;
     String message_put_task = null;
+    String s_rotasi;
     private class putTask extends AsyncTask<Void,Void,String[]> {
 
         @Override
@@ -1502,8 +1605,10 @@ public class progress_order extends AppCompatActivity
                 String s_nama = URLEncoder.encode(nama_task.getText().toString(),"utf-8");
                 String s_deskripsi = URLEncoder.encode(deskripsion_task.getText().toString(),"utf-8");
                 String s_other = URLEncoder.encode(e_other.getText().toString(),"utf-8");
-                Log.v("url",api.url+"put_task.php?task="+s_nama+"&deskripsi="+s_deskripsi+"&id="+id_creator+"&type="+s_type+"&other="+s_other+"&id_ring="+s_id_ring);
-                JSONObject object = jsParser.AmbilJson(api.url+"put_task.php?task="+s_nama+"&deskripsi="+s_deskripsi+"&id="+id_creator+"&type="+s_type+"&other="+s_other+"&id_ring="+s_id_ring);
+                String S_prompt_latitude = URLEncoder.encode(txt_prompt_latitude,"utf-8");
+                String S_prompt_longi = URLEncoder.encode(txt_prompt_longi,"utf-8");
+                Log.v("url",api.url+"put_task.php?task="+s_nama+"&deskripsi="+s_deskripsi+"&id="+id_creator+"&type="+s_type+"&other="+s_other+"&id_ring="+s_id_ring+"&latitude="+S_prompt_latitude+"&longitude="+S_prompt_longi);
+                JSONObject object = jsParser.AmbilJson(api.url+"put_task.php?task="+s_nama+"&deskripsi="+s_deskripsi+"&id="+id_creator+"&type="+s_type+"&other="+s_other+"&id_ring="+s_id_ring+"&latitude="+S_prompt_latitude+"&longitude="+S_prompt_longi);
                 String status = "";
                 status = object.getString("status");
                 status_put_task = status;
@@ -1881,6 +1986,22 @@ public class progress_order extends AppCompatActivity
         mapCapt();
     }
 
+    public void peta_dan_gps(){
+        LatLng sydney = new LatLng(Double.parseDouble(s_latitude), Double.parseDouble(s_longitude));
+        mMap.clear();
+        mMap.addMarker(new MarkerOptions().position(sydney));
+        mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
+        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(sydney, 15));
+        //getUiSettings().setScrollGesturesEnabled(false);
+
+        String koordinat = String.valueOf(s_latitude+","+s_longitude);
+        valueAddress valAddress = new valueAddress();
+        // Start downloading the geocoding places
+        valAddress.execute(koordinat);
+
+        mapCapt();
+    }
+
     public void mapCapt(){
         mMap.setOnMapLoadedCallback(new GoogleMap.OnMapLoadedCallback() {
             public void onMapLoaded() {
@@ -1953,8 +2074,17 @@ public class progress_order extends AppCompatActivity
                         Log.v("address","kondisi");
                         Log.v("address",String.valueOf(addresses));
 
-                        s_latitude = String.valueOf(Double.parseDouble(latlong[0]));
-                        s_longitude = String.valueOf(Double.parseDouble(latlong[1]));
+                        try {
+
+                            s_latitude = String.valueOf(Double.parseDouble(latlong[0])).substring(0, 10);
+                            s_longitude = String.valueOf(Double.parseDouble(latlong[1])).substring(0, 10);
+
+                        }catch (Exception e){
+
+                            s_latitude = String.valueOf(Double.parseDouble(latlong[0]));
+                            s_longitude = String.valueOf(Double.parseDouble(latlong[1]));
+
+                        }
                     } else {
                         Log.v("address","tidak ada");
                     }
@@ -1976,7 +2106,7 @@ public class progress_order extends AppCompatActivity
             if(s_latitude.equals("0.0")){
                 doneTask();
             }else{
-                address.setText(s_address);
+                e_address.setText(s_address);
 
                 t_latitude = (TextView)findViewById(R.id.d_latitude);
                 t_longitude = (TextView)findViewById(R.id.d_longitude);
@@ -2011,4 +2141,94 @@ public class progress_order extends AppCompatActivity
         builder.show();
 
     }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        //finish();
+    }
+
+        public void gpsManager(){
+            try{
+
+                locationManager=(LocationManager) progress_order.this.getSystemService(Context.LOCATION_SERVICE);
+                locationManager.requestLocationUpdates( LocationManager.GPS_PROVIDER,
+                        10000,
+                        10, locationListenerGPS);
+
+            }catch (Exception e){
+                Toast.makeText(progress_order.this,"GPS belum di temukan tunggu beberapa saat",Toast.LENGTH_LONG).show();
+            }
+
+            //isLocationEnabled();
+
+//        LocationListenermLocationClient = new LocationClient(this, this, this);
+//
+//        mLocationRequest = LocationRequest.create();
+//        mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+//        mLocationRequest.setInterval(UPDATE_INTERVAL);
+//        mLocationRequest.setFastestInterval(FASTEST_INTERVAL);
+    }
+//
+
+
+    LocationListener locationListenerGPS = new LocationListener() {
+        @Override
+        public void onLocationChanged(android.location.Location location) {
+            double latitude=location.getLatitude();
+            double longitude=location.getLongitude();
+            //String msg="New Latitude: "+latitude + "New Longitude: "+longitude;
+            //Toast.makeText(progress_order.this,msg,Toast.LENGTH_LONG).show();
+            s_latitude  = String.valueOf(latitude);
+            s_longitude = String.valueOf(longitude);
+            peta_dan_gps();
+        }
+
+        @Override
+        public void onStatusChanged(String provider, int status, Bundle extras) {
+
+
+
+        }
+
+        @Override
+        public void onProviderEnabled(String provider) {
+
+        }
+
+        @Override
+        public void onProviderDisabled(String provider) {
+
+        }
+    };
+
+
+    private void ShowExif(ExifInterface exif)
+    {
+        String myAttribute="Exif information ---\n";
+        myAttribute += getTagString(ExifInterface.TAG_DATETIME, exif);
+        myAttribute += getTagString(ExifInterface.TAG_FLASH, exif);
+        myAttribute += getTagString(ExifInterface.TAG_GPS_LATITUDE, exif);
+        myAttribute += getTagString(ExifInterface.TAG_GPS_LATITUDE_REF, exif);
+        myAttribute += getTagString(ExifInterface.TAG_GPS_LONGITUDE, exif);
+        myAttribute += getTagString(ExifInterface.TAG_GPS_LONGITUDE_REF, exif);
+        myAttribute += getTagString(ExifInterface.TAG_IMAGE_LENGTH, exif);
+        myAttribute += getTagString(ExifInterface.TAG_IMAGE_WIDTH, exif);
+        myAttribute += getTagString(ExifInterface.TAG_MAKE, exif);
+        myAttribute += getTagString(ExifInterface.TAG_MODEL, exif);
+        myAttribute += getTagString(ExifInterface.TAG_ORIENTATION, exif);
+        myAttribute += getTagString(ExifInterface.TAG_WHITE_BALANCE, exif);
+        s_rotasi = getTagString(ExifInterface.TAG_ORIENTATION, exif);
+
+        Log.v("Log",s_rotasi);
+
+    }
+
+    private String getTagString(String tag, ExifInterface exif)
+    {
+        return(tag + " : " + exif.getAttribute(tag) + "\n");
+    }
+
+
+
 }

@@ -69,7 +69,12 @@ public class UserSessionManager {
 			
 			// user is not logged in redirect him to Login Activity
 			Intent i = null;
-			i = new Intent(_context, menu_role.class);
+			if(pref.getString(KEY_ROLE,"").equals("2")){
+				i = new Intent(_context, menu_utama.class);
+			}else{
+				i = new Intent(_context, report_progress.class);
+			}
+
 			// Closing all the Activities from stack
 			i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 			
@@ -114,13 +119,13 @@ public class UserSessionManager {
         editor.putBoolean(IS_USER_LOGIN, false);
         //Log.v("logsession",pref.getString(KEY_USERNAME, null));
 		editor.commit();
-		
+
 		// After logout redirect user to Login Activity
 		Intent i = new Intent(_context, login.class);
 		
 		// Closing all the Activities
 		i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-		
+
 		// Add new Flag to start new Activity
 		i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 		
