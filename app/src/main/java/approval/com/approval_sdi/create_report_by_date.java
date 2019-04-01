@@ -1,14 +1,21 @@
 package approval.com.approval_sdi;
 
+import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.PowerManager;
+import android.os.StrictMode;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.FileProvider;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -43,6 +50,27 @@ public class create_report_by_date extends AppCompatActivity implements View.OnC
         View view = li.inflate(R.layout.create_report_by_date, null);
         setContentView(view);
 
+        if (android.os.Build.VERSION.SDK_INT > 9)
+        {
+            StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
+            StrictMode.setThreadPolicy(policy);
+        }
+
+        int PERMISSION_ALL = 1;
+
+        String[] PERMISSIONS = {
+                android.Manifest.permission.ACCESS_FINE_LOCATION,
+                android.Manifest.permission.ACCESS_COARSE_LOCATION,
+                android.Manifest.permission.READ_PHONE_STATE,
+                android.Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                android.Manifest.permission.READ_EXTERNAL_STORAGE,
+                android.Manifest.permission.CAMERA
+        };
+
+        if(!hasPermissions(this, PERMISSIONS)){
+            ActivityCompat.requestPermissions(this, PERMISSIONS, PERMISSION_ALL);
+        }
+
         model = new model(ctx);
         model.loadElementCreateReportByDate(view);
         model.btn_generate.setOnClickListener(this);
@@ -70,6 +98,7 @@ public class create_report_by_date extends AppCompatActivity implements View.OnC
     }
 
     public void generate(){
+        createDir();
 
         String S_date_awal      = null;
         String S_date_akhir     = null;
@@ -103,9 +132,10 @@ public class create_report_by_date extends AppCompatActivity implements View.OnC
                                         try {
                                             model.s_url_excel   = obj.getString("url")+"/"+nama_file.getText().toString();
                                             model.s_nama_file   = nama_file.getText().toString();
-                                            model.toast(ctx,model.s_url_excel);
-                                            final DownloadTask downloadTask = new DownloadTask(ctx);
-                                            downloadTask.execute(model.s_url_excel);
+                                            doneTask(model.s_nama_file);
+                                            //model.toast(ctx,model.s_url_excel);
+                                            //final DownloadTask downloadTask = new DownloadTask(ctx);
+                                            //downloadTask.execute(model.s_url_excel);
                                         } catch (JSONException e) {
                                             e.printStackTrace();
                                         }
@@ -121,7 +151,7 @@ public class create_report_by_date extends AppCompatActivity implements View.OnC
                         }
                     } catch (JSONException e) {
                         e.printStackTrace();
-                        Toast.makeText(ctx,String.valueOf(e),Toast.LENGTH_LONG).show();
+                        //Toast.makeText(ctx,String.valueOf(e),Toast.LENGTH_LONG).show();
                     }
                 }
             });
@@ -162,7 +192,7 @@ public class create_report_by_date extends AppCompatActivity implements View.OnC
 
                 input = connection.getInputStream();
 
-                output = new FileOutputStream("/sdcard/reportku/"+model.s_nama_file);
+                output = new FileOutputStream(Environment.getExternalStorageDirectory()+"/reportku/"+model.s_nama_file);
                 //output = new FileOutputStream("/sdcard/reportku/hana.apk");
 
                 byte data[] = new byte[4096];
@@ -179,7 +209,7 @@ public class create_report_by_date extends AppCompatActivity implements View.OnC
                     output.write(data, 0, count);
                 }
             } catch (Exception e) {
-                Log.v("error","error2");
+                Log.v("error",String.valueOf(e));
                 return e.toString();
 
             } finally {
@@ -228,41 +258,144 @@ public class create_report_by_date extends AppCompatActivity implements View.OnC
         protected void onPostExecute(String result) {
             mWakeLock.release();
             mProgressDialog.dismiss();
-            if (result != null)
-                Toast.makeText(context, "Download Error" + result, Toast.LENGTH_LONG).show();
-            else{
+            if(category_file == 1){
+                if (result != null)
+                    Toast.makeText(context, "Download Error" + result, Toast.LENGTH_LONG).show();
+                else{
+                    Toast.makeText(context, "Berhasil Terdownload", Toast.LENGTH_SHORT).show();
 
-                Toast.makeText(context, "Berhasil Terdownload", Toast.LENGTH_SHORT).show();
+                    try {
+                        Intent intent = new Intent(Intent.ACTION_VIEW);
+                        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                        //File f = new File("/mnt/sdcard/reportku/"+model.s_nama_file);
+                        File f = new File(Environment.getExternalStorageDirectory()+"/reportku/"+model.s_nama_file);
 
-                try {
-                    Intent intent = new Intent(Intent.ACTION_VIEW);
-                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                    File f = new File("/mnt/sdcard/reportku/"+model.s_nama_file);
-
-                    Uri uri = null;
+                        Uri uri = null;
 
 
-                    // So you have to use Provider
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                        uri = FileProvider.getUriForFile(ctx,getApplicationContext().getPackageName() + ".provider", f);
+                        // So you have to use Provider
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                            uri = FileProvider.getUriForFile(ctx,getApplicationContext().getPackageName() + ".provider", f);
 
-                        // Add in case of if We get Uri from fileProvider.
-                        intent.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
-                        intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-                    }else{
-                        uri = Uri.fromFile(f);
+                            // Add in case of if We get Uri from fileProvider.
+                            intent.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
+                            intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                        }else{
+                            uri = Uri.fromFile(f);
+                        }
+
+                        intent.setDataAndType(uri, "application/vnd.ms-excel");
+                        startActivity(intent);
+                    } catch(Exception e) {
                     }
-
-                    intent.setDataAndType(uri, "application/vnd.ms-excel");
-                    startActivity(intent);
-                } catch(Exception e) {
+                }
+            }else{
+                try{
+                    share(model.s_nama_file);
+                }catch (Exception e){
+                    model.toast(ctx,"error:"+String.valueOf(e));
+                    Log.v("error",String.valueOf(e));
                 }
 
-
             }
-
         }
     }
 
+    int category_file = 0;
+    public void doneTask(final String nama_file){
+        final AlertDialog.Builder builder = new AlertDialog.Builder(ctx);
+        builder.setCancelable(true);
+
+        builder.setTitle("Action");
+        builder.setMessage("Pilih Action Dibawah ini");
+        builder.setPositiveButton("Buka File", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                category_file = 1;
+                //model.toast(ctx,model.s_url_excel);
+                final DownloadTask downloadTask = new DownloadTask(ctx);
+                downloadTask.execute(model.s_url_excel);
+
+            }
+        });
+        builder.setNegativeButton("Share File", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                category_file = 2;
+                //model.toast(ctx,model.s_url_excel);
+                final DownloadTask downloadTask = new DownloadTask(ctx);
+                downloadTask.execute(model.s_url_excel);
+            }
+        });
+        builder.show();
+
+    }
+    public static final int REQUEST_PERMISSION = 200;
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+
+        if (requestCode == REQUEST_PERMISSION && grantResults.length > 0) {
+            if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                Toast.makeText(this, "Thanks for granting Permission", Toast.LENGTH_SHORT).show();
+            }
+        }
+    }
+
+    public static boolean hasPermissions(Context context, String... permissions) {
+        if (context != null && permissions != null) {
+            for (String permission : permissions) {
+                if (ActivityCompat.checkSelfPermission(context, permission) != PackageManager.PERMISSION_GRANTED) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
+    public void createDir() {
+        // create a File object for the parent directory
+        String dir = Environment.getExternalStorageDirectory()+"/reportku/";
+        //model.toast(ctx,dir);
+        File wallpaperDirectory = new File(dir);
+        // have the object build the directory structure, if needed.
+        wallpaperDirectory.mkdirs();
+    }
+
+
+//    private void share2(String nama) {
+//        Intent intent = new Intent(Intent.ACTION_SEND);
+//        intent.setType("application/x-excel");
+//        String imagePath = Environment.getExternalStorageDirectory()
+//                + "/reportku/"+nama_file;
+//        intent.putExtra(Intent.EXTRA_STREAM, );
+//        startActivity(Intent.createChooser(intent, "Send "));
+//    }
+
+    private void share(String nama_file) {
+        Intent share = new Intent(Intent.ACTION_SEND);
+
+        share.setType("application/x-excel");
+
+        String imagePath = Environment.getExternalStorageDirectory()
+                + "/reportku/"+nama_file;
+
+        Log.v("list",imagePath);
+
+        //File imageFileToShare = new File(imagePath);
+        //Uri uri = Uri.fromFile(imageFileToShare);
+
+        File f = new File(Environment.getExternalStorageDirectory()+"/reportku/"+nama_file);
+
+
+        Uri imageUri = FileProvider.getUriForFile(
+                ctx,
+                "reportku.com.id", f);
+
+        share.putExtra(Intent.EXTRA_STREAM, imageUri);
+
+        startActivity(Intent.createChooser(share, "Share laporan Excel"));
+    }
 
 }

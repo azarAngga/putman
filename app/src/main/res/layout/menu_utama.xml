@@ -12,18 +12,19 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-
         <TextView
-            android:layout_marginTop="200dp"
+            android:textStyle="bold"
+            android:layout_marginTop="100dp"
             android:id="@+id/kat"
             android:layout_centerHorizontal="true"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:gravity="center"
             android:text="Pilih Kategori Pekerjaan"
-            android:textSize="12pt" />
+            android:textSize="15pt" />
 
         <LinearLayout
+            android:id="@+id/ln_mid"
             android:layout_below="@+id/kat"
             android:gravity="center"
             android:orientation="horizontal"
@@ -46,7 +47,6 @@
                     android:textColor="@color/white"
                     />
                 <TextView
-                    android:textStyle="bold"
                     android:textSize="12pt"
                     android:layout_margin="10dp"
                     android:layout_gravity="center"
@@ -69,7 +69,6 @@
                     />
 
                 <TextView
-                    android:textStyle="bold"
                     android:textSize="12pt"
                     android:layout_margin="10dp"
                     android:layout_gravity="center"
@@ -80,6 +79,32 @@
 
 
             </LinearLayout>
+
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_centerHorizontal="true"
+            android:layout_below="@+id/ln_mid"
+            android:layout_margin="10dp"
+            android:orientation="vertical"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+            <ImageView
+                android:background="@drawable/non_ms2"
+                android:id="@+id/non_ms"
+                android:layout_width="150dp"
+                android:layout_height="150dp"
+                />
+
+            <TextView
+                android:textSize="12pt"
+                android:layout_margin="10dp"
+                android:layout_gravity="center"
+                android:text="Non MS"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+
 
 
         </LinearLayout>

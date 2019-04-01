@@ -34,7 +34,7 @@ public class frame_management extends AppCompatActivity implements View.OnClickL
 
         model.btn_create_rute.setOnClickListener(this);
         model.btn_create_user.setOnClickListener(this);
-        model.btn_mapping_rute_user.setOnClickListener(this);
+        model.copy_rute.setOnClickListener(this);
         model.btn_report.setOnClickListener(this);
 
     }
@@ -49,8 +49,8 @@ public class frame_management extends AppCompatActivity implements View.OnClickL
             case R.id.create_rute:
                 in = new Intent(ctx,create_task.class);
                 break;
-            case R.id.create_mapping:
-                in = new Intent(ctx,create_mapping.class);
+            case R.id.copy_rute:
+                in = new Intent(ctx,copy_rute.class);
                 break;
             case R.id.report:
                 in = new Intent(ctx,create_report_by_date.class);

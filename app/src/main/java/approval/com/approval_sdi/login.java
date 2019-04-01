@@ -10,21 +10,27 @@ import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.StrictMode;
 import android.support.annotation.NonNull;
 import android.support.v4.content.ContextCompat;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -62,6 +68,47 @@ public class login extends Activity{
 
     int kendala = 0;
     SharedPreferences sharedPreferences;
+    Context ctx = login.this;
+    model model = new model(ctx);
+
+    public void get_login(){
+        String url = "login2.php";
+        try{
+            String Str_username	= URLEncoder.encode(username.getText().toString(),"utf-8");
+            String Str_password	= URLEncoder.encode(password.getText().toString(),"utf-8");
+            url +="?username="+Str_username+"&password="+Str_password;
+            Log.v("url login",url);
+        }catch(UnsupportedEncodingException e){
+
+        }
+        String S_url        = url;
+        model.get(S_url, new MyCallback() {
+            @Override
+            public void callbackCall(JSONObject obj) {
+                try{
+                    model.toast(ctx,obj.getString("status"));
+                    if(obj.getString("status").equals("sukses")){
+                        session.createUserLoginSession(obj.getString("id_user"),s_nama,password.getText().toString(),obj.getString("role"));
+                        Intent i = null;
+                        role_id = obj.getString("role");
+                        createDir();
+                        if(role_id.trim().equals("2")){
+                            i = new Intent(login.this, menu_utama.class);
+
+                        }else{
+                            i = new Intent(login.this, report_progress.class);
+                        }
+                        startActivity(i);
+                        finish();
+
+                    }
+
+                }catch (Exception e){
+                    Log.v("errrorHttp",String.valueOf(e));
+                }
+            }
+        });
+    }
 
     class get_info extends AsyncTask<String, String,String >{
         @Override
@@ -184,6 +231,12 @@ public class login extends Activity{
         super.onCreate(savedInstanceState);
         setContentView(R.layout.login);
 
+        if (android.os.Build.VERSION.SDK_INT > 9)
+        {
+            StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
+            StrictMode.setThreadPolicy(policy);
+        }
+
         session = new UserSessionManager(getApplicationContext());
         sharedPreferences = getSharedPreferences(PREFER_NAME,Context.MODE_PRIVATE);
         //String islogin = sharedPreferences.getString(KEY_USERNAME, "");
@@ -216,9 +269,9 @@ public class login extends Activity{
                 }else{
                     String a = username.getText().toString().trim();
                     String b = password.getText().toString().trim();
-                    new get_info().execute(a,b);
+                    get_login();
+                    //new get_info().execute(a,b);
                 }
-
             }
 
         });

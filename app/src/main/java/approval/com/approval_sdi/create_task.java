@@ -95,7 +95,7 @@ public class create_task extends AppCompatActivity implements OnClickListener, D
             model.rb_ring_1.setChecked(false);
             model.rb_ring_2.setChecked(false);
             model.s_location = "3";
-            model.e_ring_other.setVisibility(View.VISIBLE);
+            //model.e_ring_other.setVisibility(View.VISIBLE);
         }
     }
 
@@ -168,6 +168,9 @@ public class create_task extends AppCompatActivity implements OnClickListener, D
                 break;
             case R.id.rb_preventive:
                 model.s_category = "1";
+                break;
+            case R.id.rb_non_ms:
+                model.s_category = "3";
                 break;
         }
     }

@@ -51,8 +51,13 @@ public class model {
     SharedPreferences sharedPreferences;
 
     public model(Context context){
-        sharedPreferences = context.getSharedPreferences(PREFER_NAME,Context.MODE_PRIVATE);
-        s_user = sharedPreferences.getString(KEY_USERNAME,"0");
+        try{
+            sharedPreferences = context.getSharedPreferences(PREFER_NAME,Context.MODE_PRIVATE);
+            s_user = sharedPreferences.getString(KEY_USERNAME,"0");
+        }catch (Exception e){
+
+        }
+
         this.ctx = context;
     }
 
@@ -98,6 +103,17 @@ public class model {
         }
     }
 
+
+    //*
+    // class create task
+    // *
+
+
+   LinearLayout ln_copy;
+    public void loadElementCreateCopyTask(View v){
+        ln_copy         = (LinearLayout)v.findViewById(R.id.row_ln);
+
+    }
 
     //*
     // class create task
@@ -286,10 +302,10 @@ public class model {
     // class frame management
     // *
 
-    Button btn_create_user,btn_create_rute,btn_mapping_rute_user,btn_report;
+    Button btn_create_user,btn_create_rute,copy_rute,btn_report;
     public void loadElementFrameManagement(View v){
         btn_create_user 		= (Button) v.findViewById(R.id.create_user);
-        btn_mapping_rute_user 	= (Button) v.findViewById(R.id.create_mapping);
+        copy_rute 	            = (Button) v.findViewById(R.id.copy_rute);
         btn_create_rute 		= (Button) v.findViewById(R.id.create_rute);
         btn_report   		    = (Button) v.findViewById(R.id.report);
 

@@ -10,9 +10,11 @@ import android.os.Bundle;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ShareActionProvider;
 import android.widget.TextView;
 
 import com.roomorama.caldroid.CaldroidFragment;
@@ -21,6 +23,7 @@ import com.roomorama.caldroid.CaldroidListener;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -49,7 +52,7 @@ public class report_progress extends AppCompatActivity {
     SharedPreferences sharedPreferences;
     UserSessionManager session;
 
-    private void setCustomResourceForDates() {
+    private void setCustomResourceForDates(){
         String date = null;
         String type = null;
 
@@ -126,11 +129,20 @@ public class report_progress extends AppCompatActivity {
         session 	= new UserSessionManager(getApplicationContext());
         final SimpleDateFormat formatter = new SimpleDateFormat("dd MMM yyyy");
 
+//        String sDate1="18/03/2019";
+//        try {
+//            Date date1=new SimpleDateFormat("EEE dd/MM/yyyy").parse(sDate1);
+//            Log.v("date",String.valueOf(date1.getDay()));
+//        } catch (ParseException e) {
+//            e.printStackTrace();
+//        }
+
         caldroidFragment = new CaldroidFragment();
 
         final Button all_task   = (Button)findViewById(R.id.all_task);
         final Button logout     = (Button)findViewById(R.id.logout);
         final Button frame_management     = (Button)findViewById(R.id.frame_management);
+        final Button pemroses     = (Button)findViewById(R.id.pemroses);
 
         all_task.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -154,7 +166,15 @@ public class report_progress extends AppCompatActivity {
         String role = session.pref.getString(KEY_ROLE,"0");
         if(role.equals("3")){
             frame_management.setVisibility(View.VISIBLE);
+            pemroses.setVisibility(View.VISIBLE);
         }
+
+        pemroses.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(report_progress.this,menu_utama.class));
+            }
+        });
 
         frame_management.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -431,6 +451,9 @@ public class report_progress extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         finish();
+
+
         return super.onOptionsItemSelected(item);
     }
+
 }

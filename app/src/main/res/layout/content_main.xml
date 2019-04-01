@@ -47,6 +47,29 @@
             </android.support.v7.widget.CardView>
             <!-- Location -->
 
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <RadioButton
+                android:id="@+id/mode1"
+                android:checked="true"
+                android:layout_weight="1"
+                android:text="Mode Camera 1"
+                android:gravity="center_vertical"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+
+            <RadioButton
+                android:id="@+id/mode2"
+                android:text="Mode Camera 2"
+                android:gravity="center_vertical"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+
+        </LinearLayout>
+
             <!-- Foto -->
             <android.support.v7.widget.CardView
                 android:layout_marginTop="10dp"
@@ -74,6 +97,50 @@
                     tools:ignore="OnClick" />
             </LinearLayout>
             </android.support.v7.widget.CardView>
+            <!-- deskripsi -->
+        <!-- value -->
+        <android.support.v7.widget.CardView
+            android:layout_marginTop="10dp"
+            android:layout_width="match_parent"
+            android:layout_height="110dp">
+
+            <LinearLayout
+                android:padding="10dp"
+                android:gravity="center"
+                android:orientation="vertical"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <LinearLayout
+                    android:orientation="horizontal"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:orientation="vertical"
+                        android:layout_height="160dp">
+
+                        <TextView
+                            android:text="Deskripsi Foto :"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content" />
+
+                        <EditText
+                            android:textSize="5pt"
+                            android:hint="isi disini"
+                            android:id="@+id/deskripsi_foto"
+                            android:layout_width="match_parent"
+                            android:layout_height="100dp"
+                            android:inputType="textMultiLine"
+                            android:gravity="top"/>
+
+                    </LinearLayout>
+                </LinearLayout>
+            </LinearLayout>
+        </android.support.v7.widget.CardView>
+
             <!-- value -->
             <android.support.v7.widget.CardView
                 android:layout_marginTop="10dp"
@@ -137,10 +204,9 @@
                                         android:layout_height="wrap_content">
 
                                         <TextView
-                                            android:layout_weight="1"
                                             android:background="@drawable/stroke"
                                             android:text="Latitude"
-                                            android:layout_width="0dp"
+                                            android:layout_width="80dp"
                                             android:layout_height="wrap_content" />
 
                                         <TextView
@@ -159,10 +225,9 @@
                                         android:layout_height="wrap_content">
 
                                         <TextView
-                                            android:layout_weight="1"
                                             android:background="@drawable/stroke"
                                             android:text="Longitude"
-                                            android:layout_width="0dp"
+                                            android:layout_width="80dp"
                                             android:layout_height="wrap_content" />
 
                                         <TextView

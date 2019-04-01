@@ -77,6 +77,7 @@ public class detil_view_laporan extends AppCompatActivity implements RadioGroup.
     SharedPreferences pref;
     ImageView delete_img;
     LinearLayout ln_settings;
+    String id_user;
 
     TextView t_task_name,t_category,t_location,t_date,t_deskripsi;
     private Context context;
@@ -151,7 +152,7 @@ public class detil_view_laporan extends AppCompatActivity implements RadioGroup.
         String role = pref.getString("role","");
         Log.v("role",role);
         if(role.equals("3")){
-            e_deskripsi.setVisibility(View.VISIBLE);
+            //e_deskripsi.setVisibility(View.VISIBLE);
             t_deskripsi.setVisibility(View.GONE);
             update.setVisibility(View.VISIBLE);
             ln_settings.setVisibility(View.GONE);
@@ -161,14 +162,12 @@ public class detil_view_laporan extends AppCompatActivity implements RadioGroup.
             delete.setEnabled(false);
             delete.setBackground(grey);
         }else{
-
-
             delete_img.setVisibility(View.GONE);
             delete.setEnabled(false);
             delete.setBackground(grey);
-
-
         }
+
+        t_deskripsi.setVisibility(View.GONE);
 
 
         if(s_is_done.equals("1")){
@@ -245,7 +244,7 @@ public class detil_view_laporan extends AppCompatActivity implements RadioGroup.
     private class getData extends AsyncTask<Void,Void,String[]> {
 
         @Override
-        protected String[] doInBackground(Void... voids) {
+        protected String[] doInBackground(Void... voids){
             ahas.clear();
             String S_id       = null;
             String S_user_id  = null;
@@ -271,6 +270,7 @@ public class detil_view_laporan extends AppCompatActivity implements RadioGroup.
 
 
             try {
+                id_user    = object.getString("id_user");
                 s_status    = object.getString("status");
                 jsArray     = object.getJSONArray("url");
                 s_task_name = object.getString("task_name");
@@ -308,9 +308,23 @@ public class detil_view_laporan extends AppCompatActivity implements RadioGroup.
 
                 if(s_status.equals("T")){
                     if(s_category.equals("preventive")){
-                        img_category.setImageDrawable(ctx.getDrawable(R.drawable.ic_mantenance_new));
+                        try{
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                                img_category.setImageDrawable(ctx.getDrawable(R.drawable.ic_mantenance_new));
+                            }
+                        }catch (Exception e){
+
+                        }
+
                     }else{
-                        img_category.setImageDrawable(ctx.getDrawable(R.drawable.ic_mantenance_2new));
+                        try{
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                                img_category.setImageDrawable(ctx.getDrawable(R.drawable.ic_mantenance_2new));
+                            }
+                        }catch (Exception e){
+
+                        }
+
                     }
                     JSONArray for_img = jsArray
                             ,for_radio = jsArray;
@@ -348,6 +362,9 @@ public class detil_view_laporan extends AppCompatActivity implements RadioGroup.
                     t_category.setText(s_category);
                     e_deskripsi.setText(s_deskripsi);
 
+                    if(id_user.equals(s_id_user)){
+                        ln_settings.setVisibility(View.VISIBLE);
+                    }
 
                 }else{
                     Toast.makeText(ctx,s_message,Toast.LENGTH_LONG).show();

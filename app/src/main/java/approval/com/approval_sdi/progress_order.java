@@ -45,6 +45,7 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewTreeObserver;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.AdapterView;
@@ -102,7 +103,7 @@ import reportku.com.id.R;
 import static android.provider.MediaStore.Files.FileColumns.MEDIA_TYPE_IMAGE;
 
 public class progress_order extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener,OnMapReadyCallback, View.OnClickListener {
+        implements NavigationView.OnNavigationItemSelectedListener,OnMapReadyCallback, View.OnClickListener, View.OnLongClickListener {
 
     LocationManager locationManager;
     public static int MY_PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION = 1;
@@ -141,6 +142,8 @@ public class progress_order extends AppCompatActivity
     LocationManager lm;
     LocationListener ll;
     TextView t_latitude,t_longitude;
+    String exif_width = "";
+    String exif_height = "";
 
     private Uri fileUri= null;
     LinearLayout listlinear;
@@ -161,8 +164,10 @@ public class progress_order extends AppCompatActivity
     modelData model;
     String s_type = null;
     String s_address = "";
-    EditText e_address;
+    EditText e_address,e_deskripsi_foto;
 
+    String s_mode  = "1";
+    RadioButton mode1,mode2;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -177,8 +182,6 @@ public class progress_order extends AppCompatActivity
         // add FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS flag to the window
         window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
 
-
-
       //  getActionBar().setBackgroundDrawable(new ColorDrawable(this.getResources().getColor(R.color.blue)));
 
         gps = new GPSTracker(this);
@@ -188,7 +191,31 @@ public class progress_order extends AppCompatActivity
         submit      = (Button)findViewById(R.id.submit);
         prompt_task = (Button)findViewById(R.id.prompt_task);
 
+
+
+        mode1      = (RadioButton)findViewById(R.id.mode1);
+        mode2      = (RadioButton)findViewById(R.id.mode2);
+
+        mode1.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                s_mode = "1";
+                mode1.setChecked(true);
+                mode2.setChecked(false);
+            }
+        });
+
+        mode2.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                s_mode = "2";
+                mode1.setChecked(false);
+                mode2.setChecked(true);
+            }
+        });
+
         submit.setOnClickListener(this);
+        submit.setOnLongClickListener(this);
         prompt_task.setOnClickListener(this);
 
         Intent intent = getIntent();
@@ -197,7 +224,6 @@ public class progress_order extends AppCompatActivity
         loadMap();
         getgps();
         loadElement();
-
 
 
         currentDateandTime = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date());
@@ -248,12 +274,18 @@ public class progress_order extends AppCompatActivity
             }
             toolbar.setBackgroundColor(Color.parseColor("#159afc"));
             toolbar.setTitle("Preventive");
-        }else{
+        }else if(s_type.equals("2")){
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                 window.setStatusBarColor(ContextCompat.getColor(this,R.color.colorPrimary));
             }
             toolbar.setBackgroundColor(Color.parseColor("#159afc"));
             toolbar.setTitle("Corrective");
+        }else{
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                window.setStatusBarColor(ContextCompat.getColor(this,R.color.colorPrimary));
+            }
+            toolbar.setBackgroundColor(Color.parseColor("#159afc"));
+            toolbar.setTitle("Non-MS");
         }
 
         setSupportActionBar(toolbar);
@@ -306,6 +338,7 @@ public class progress_order extends AppCompatActivity
         task =  (Spinner)findViewById(R.id.task);
         img =  (ImageView)findViewById(R.id.img);
         e_address  = (EditText)findViewById(R.id.address);
+        e_deskripsi_foto  = (EditText)findViewById(R.id.deskripsi_foto);
 
         //load_map =  (ImageView)findViewById(R.id.load_map);
         BitmapFactory.Options options = new BitmapFactory.Options();
@@ -358,7 +391,14 @@ public class progress_order extends AppCompatActivity
         int id = item.getItemId();
         Intent in = null;
         if(id == R.id.nav_menu_utama){
-            in  = new Intent(progress_order.this,menu_role.class);
+            String role = sharedPreferences.getString(KEY_ROLE, "");
+            if(role.equals("3")){
+                in  = new Intent(progress_order.this,report_progress.class);
+                finish();
+            }else{
+                in  = new Intent(progress_order.this,menu_utama.class);
+
+            }
             startActivity(in);
         }else if(id == R.id.task){
             in  = new Intent(progress_order.this,fragmen_history.class);
@@ -408,6 +448,47 @@ public class progress_order extends AppCompatActivity
 
     }
 
+    @Override
+    public boolean onLongClick(View v) {
+        try{
+            if(s_mode.equals("1")){
+                Log.v("orientasi",String.valueOf(s_rotasi.replace("Orientation","").replace(":","").replace(" ","")));
+                if(s_task_id.equals("0")) {
+                    Toast.makeText(progress_order.this,"Pilih Rute terlebih dahulu, jika Rute belum ada klik tombol 'Buat Rute Baru'",Toast.LENGTH_LONG).show();
+                }else if(e_address.getText().toString().equals("")){
+                    Toast.makeText(progress_order.this,"Alamat kosong, isi alamat terlebih dahulu",Toast.LENGTH_LONG).show();
+                }else if(e_deskripsi_foto.getText().toString().equals("")){
+                    Toast.makeText(progress_order.this,"Deskripsi foto kosong, isi terlebih dahulu",Toast.LENGTH_LONG).show();
+                }else if(!is_capture){
+                    Toast.makeText(progress_order.this,"Ambil Foto Terlebih Dahulu",Toast.LENGTH_LONG).show();
+                }else{
+                    promptImage();
+                }
+            }else{
+                if(s_task_id.equals("0")) {
+                    Toast.makeText(progress_order.this,"Pilih Rute terlebih dahulu, jika Rute belum ada klik tombol 'Buat Rute Baru'",Toast.LENGTH_LONG).show();
+                }else if(e_address.getText().toString().equals("")){
+                    Toast.makeText(progress_order.this,"Alamat kosong, isi alamat terlebih dahulu",Toast.LENGTH_LONG).show();
+                }else if(e_deskripsi_foto.getText().toString().equals("")){
+                    Toast.makeText(progress_order.this,"Deskripsi foto kosong, isi terlebih dahulu",Toast.LENGTH_LONG).show();
+                }else if(Integer.parseInt(exif_height) > Integer.parseInt(exif_width)){
+                    Toast.makeText(progress_order.this,"Terdeteksi hasil kamera tidak landscape dengan benar, gunakan landscape untuk hasil foto",Toast.LENGTH_LONG).show();
+                }else if(!is_capture){
+                    Toast.makeText(progress_order.this,"Ambil Foto Terlebih Dahulu",Toast.LENGTH_LONG).show();
+                }else{
+                    //Toast.makeText(progress_order.this,"ok",Toast.LENGTH_LONG).show();
+                    promptImage();
+                }
+
+            }
+
+
+        }catch (Exception e){
+            Toast.makeText(progress_order.this,"Ambil Foto terlebih dahulu dalam aplikasi",Toast.LENGTH_LONG).show();
+
+        }
+        return false;
+    }
 
 
     private class getTask extends AsyncTask<Void,Void,String[]> {
@@ -573,8 +654,7 @@ public class progress_order extends AppCompatActivity
         userInput = (EditText) promptsView
                 .findViewById(R.id.prompt);
 
-       img = (ImageView) promptsView
-                .findViewById(R.id.img);
+       img = (ImageView) promptsView.findViewById(R.id.img);
         img.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -639,27 +719,43 @@ public class progress_order extends AppCompatActivity
     String txt_prompt_latitude;
     String txt_prompt_longi;
     public void promptImage(){
+
+        if(s_mode.equals("2")){
+            imageFilePath = fileUri.getPath();
+        }
+
+        String timeStamp  = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss", Locale.getDefault()).format(new Date());
+        String timeStamp2 = new SimpleDateFormat("EEE", Locale.getDefault()).format(new Date());
+        String day = convertDay(timeStamp2);
+
         //new putProgress().execute();
         LayoutInflater li = LayoutInflater.from(progress_order.this);
         View promptsView = li.inflate(R.layout.prompt_upload, null);
 
         AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(progress_order.this);
-        ImageView foto = (ImageView)promptsView.findViewById(R.id.img);
+        final ImageView foto = (ImageView)promptsView.findViewById(R.id.img);
         ImageView map  = (ImageView)promptsView.findViewById(R.id.map);
         TextView address = (TextView)promptsView.findViewById(R.id.address);
         TextView latitude = (TextView)promptsView.findViewById(R.id.d_latitude);
         TextView longitude = (TextView)promptsView.findViewById(R.id.d_longitude);
+        TextView date = (TextView)promptsView.findViewById(R.id.txt_date);
+
+        TextView deskripsi_foto = (TextView)promptsView.findViewById(R.id.deskripsi_foto_prompt);
         ln = (RelativeLayout)promptsView.findViewById(R.id.ln_prompt);
+
+
+        deskripsi_foto.setText(e_deskripsi_foto.getText().toString());
 
         // set prompts.xml to alertdialog builder
         alertDialogBuilder.setView(promptsView);
+
 
         foto.setImageURI(Uri.parse(imageFilePath));
 
         final BitmapFactory.Options options = new BitmapFactory.Options();
         options.inSampleSize = 8;
 
-        Bitmap myBitmap = BitmapFactory.decodeFile(imageFilePath,options);
+        final Bitmap myBitmap = BitmapFactory.decodeFile(imageFilePath,options);
         foto.setImageBitmap(myBitmap);
         if(String.valueOf(s_rotasi.replace("Orientation","").replace(":","")).trim().equals("3")){
             foto.setRotation(180);
@@ -667,17 +763,43 @@ public class progress_order extends AppCompatActivity
         //foto.setRotation(90);
 
         //foto.setImageBitmap(Bitmap.createScaledBitmap(myBitmap, 3000, 2000, false));
-        img.setImageBitmap(Bitmap.createScaledBitmap(myBitmap, 2000, 800, false));
+//        if(s_mode.equals("2")){
+//            foto.setImageBitmap(Bitmap.createScaledBitmap(myBitmap, 1650, 600, false));
+//        }else{
+//
+//
+//        }
+
+        ViewTreeObserver viewTreeObserver = ln.getViewTreeObserver();
+        final int[] width = {0};
+        final int[] height = {0};
+        viewTreeObserver.addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+            @Override
+            public void onGlobalLayout() {
+                ln.getViewTreeObserver().removeGlobalOnLayoutListener(this);
+                width[0] = ln.getMeasuredWidth()+170;
+                height[0] = ln.getMeasuredHeight();
+
+                foto.setImageBitmap(Bitmap.createScaledBitmap(myBitmap, width[0], height[0], false));
+
+                Log.v("lebar",String.valueOf(width[0]));
+                Log.v("tinggi",String.valueOf(height[0]));
+
+            }
+        });
+
+        //img.setImageBitmap(Bitmap.createScaledBitmap(myBitmap, 1600, 1600, false));
 
         map.setImageBitmap(BitmapFactory.decodeFile(Environment.getExternalStorageDirectory().getAbsolutePath()+"/vendor/capture_map.jpg"));
         address.setText(e_address.getText().toString());
         map.setAlpha(180);
 
-        latitude.setText(" "+s_latitude);
-        longitude.setText(" "+s_longitude);
+        latitude.setText(" "+t_latitude.getText().toString());
+        longitude.setText(" "+t_longitude.getText().toString());
+        date.setText(day+", "+timeStamp);
 
-        txt_prompt_latitude  = s_latitude;
-        txt_prompt_longi     = s_longitude;
+        txt_prompt_latitude  = latitude.getText().toString();
+        txt_prompt_longi     = longitude.getText().toString();
 
         // set dialog message
         alertDialogBuilder
@@ -746,9 +868,12 @@ public class progress_order extends AppCompatActivity
         }
 
         File mediaFile;
+        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(new Date());
+        String nama_file_ = timeStamp+".jpg";
+
         if (type == MEDIA_TYPE_IMAGE) {
             mediaFile = new File(mediaStorageDir.getPath() + File.separator
-                    + currentDateandTime + ".jpg");
+                    + nama_file_);
         } else {
             return null;
         }
@@ -904,22 +1029,42 @@ public class progress_order extends AppCompatActivity
 
     public void submit(){
         try{
-
-            Log.v("orientasi",String.valueOf(s_rotasi.replace("Orientation","").replace(":","").replace(" ","")));
-            if(s_task_id.equals("0")) {
-                Toast.makeText(progress_order.this,"Pilih Rute terlebih dahulu, jika Rute belum ada klik tombol 'Buat Rute Baru'",Toast.LENGTH_LONG).show();
-            }else if(e_address.getText().toString().equals("")){
-                Toast.makeText(progress_order.this,"Alamat kosong, isi alamat terlebih dahulu",Toast.LENGTH_LONG).show();
-            }else if(!String.valueOf(s_rotasi.replace("Orientation","").replace(":","")).trim().equals("1") && !String.valueOf(s_rotasi.replace("Orientation","").replace(":","")).trim().equals("3")){
-                Toast.makeText(progress_order.this,"Terdeteksi hasil kamera tidak landscape dengan benar, gunakan landscape untuk hasil foto",Toast.LENGTH_LONG).show();
-            }else if(!is_capture){
-                Toast.makeText(progress_order.this,"Ambil Foto Terlebih Dahulu",Toast.LENGTH_LONG).show();
+            if(s_mode.equals("1")){
+                Log.v("orientasi",String.valueOf(s_rotasi.replace("Orientation","").replace(":","").replace(" ","")));
+                if(s_task_id.equals("0")) {
+                    Toast.makeText(progress_order.this,"Pilih Rute terlebih dahulu, jika Rute belum ada klik tombol 'Buat Rute Baru'",Toast.LENGTH_LONG).show();
+                }else if(e_address.getText().toString().equals("")){
+                    Toast.makeText(progress_order.this,"Alamat kosong, isi alamat terlebih dahulu",Toast.LENGTH_LONG).show();
+                }else if(e_deskripsi_foto.getText().toString().equals("")){
+                    Toast.makeText(progress_order.this,"Deskripsi foto kosong, isi terlebih dahulu",Toast.LENGTH_LONG).show();
+                }else if(!String.valueOf(s_rotasi.replace("Orientation","").replace(":","")).trim().equals("1") && !String.valueOf(s_rotasi.replace("Orientation","").replace(":","")).trim().equals("3")){
+                    Toast.makeText(progress_order.this,"Terdeteksi hasil kamera tidak landscape dengan benar, gunakan landscape untuk hasil foto",Toast.LENGTH_LONG).show();
+                }else if(!is_capture){
+                    Toast.makeText(progress_order.this,"Ambil Foto Terlebih Dahulu",Toast.LENGTH_LONG).show();
+                }else{
+                    promptImage();
+                }
             }else{
-                promptImage();
+                if(s_task_id.equals("0")) {
+                    Toast.makeText(progress_order.this,"Pilih Rute terlebih dahulu, jika Rute belum ada klik tombol 'Buat Rute Baru'",Toast.LENGTH_LONG).show();
+                }else if(e_address.getText().toString().equals("")){
+                    Toast.makeText(progress_order.this,"Alamat kosong, isi alamat terlebih dahulu",Toast.LENGTH_LONG).show();
+                }else if(e_deskripsi_foto.getText().toString().equals("")){
+                    Toast.makeText(progress_order.this,"Deskripsi foto kosong, isi terlebih dahulu",Toast.LENGTH_LONG).show();
+                }else if(Integer.parseInt(exif_height) > Integer.parseInt(exif_width)){
+                    Toast.makeText(progress_order.this,"Terdeteksi hasil kamera tidak landscape dengan benar, gunakan landscape untuk hasil foto",Toast.LENGTH_LONG).show();
+                }else if(!is_capture){
+                    Toast.makeText(progress_order.this,"Ambil Foto Terlebih Dahulu",Toast.LENGTH_LONG).show();
+                }else{
+                    //Toast.makeText(progress_order.this,"ok",Toast.LENGTH_LONG).show();
+                    promptImage();
+                }
+
             }
 
+
         }catch (Exception e){
-            Toast.makeText(progress_order.this,"Ambil Foto terlebih dahulu",Toast.LENGTH_LONG).show();
+            Toast.makeText(progress_order.this,"Ambil Foto terlebih dahulu dalam aplikasi",Toast.LENGTH_LONG).show();
 
         }
 
@@ -963,51 +1108,58 @@ public class progress_order extends AppCompatActivity
 
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
 
-        if (requestCode == REQUEST_IMAGE) {
-            if (resultCode == RESULT_OK) {
-                //img.setImageURI(Uri.parse(imageFilePath));
 
-                try {
-                    ExifInterface exif = new ExifInterface(imageFilePath);
-                    ShowExif(exif);
+            if(requestCode == CAMERA_CAPTURE_IMAGE_REQUEST_CODE && s_mode.equals("2")){
+                if (resultCode == RESULT_OK) {
 
-
-                } catch (IOException e) {
-                    Log.v("long",String.valueOf(e));
-                    Toast.makeText(this, "Error!", Toast.LENGTH_LONG).show();
+                    previewCapturedImage();
                 }
 
+            }else if(requestCode == REQUEST_IMAGE && s_mode.equals("1")) {
+                if (resultCode == RESULT_OK) {
+                    //img.setImageURI(Uri.parse(imageFilePath));
+
+                    try {
+                        ExifInterface exif = new ExifInterface(imageFilePath);
+                        ShowExif(exif);
 
 
-                final BitmapFactory.Options options = new BitmapFactory.Options();
-                options.inSampleSize = 8;
+                    } catch (IOException e) {
+                        Log.v("long",String.valueOf(e));
+                        Toast.makeText(this, "Error!", Toast.LENGTH_LONG).show();
+                    }
 
-                Bitmap myBitmap = BitmapFactory.decodeFile(imageFilePath,options);
-                img.setImageBitmap(myBitmap);
-                //dis
-                img.setRotation(0);
-                img.setImageBitmap(Bitmap.createScaledBitmap(myBitmap, 1600, 900, false));
-                is_capture = true;
-                if(String.valueOf(s_rotasi.replace("Orientation","").replace(":","")).trim().equals("3")){
-                    img.setRotation(180);
-                }else if(String.valueOf(s_rotasi.replace("Orientation","").replace(":","")).trim().equals("6")){
-                    img.setRotation(90);
-                }else if(String.valueOf(s_rotasi.replace("Orientation","").replace(":","")).trim().equals("8")){
-                    img.setRotation(-90);
+
+
+                    final BitmapFactory.Options options = new BitmapFactory.Options();
+                    options.inSampleSize = 8;
+
+                    Bitmap myBitmap = BitmapFactory.decodeFile(imageFilePath,options);
+                    img.setImageBitmap(myBitmap);
+                    //dis
+                    img.setRotation(0);
+                    img.setImageBitmap(Bitmap.createScaledBitmap(myBitmap, 1600, 900, false));
+                    is_capture = true;
+                    if(String.valueOf(s_rotasi.replace("Orientation","").replace(":","")).trim().equals("3")){
+                        img.setRotation(180);
+                    }else if(String.valueOf(s_rotasi.replace("Orientation","").replace(":","")).trim().equals("6")){
+                        img.setRotation(90);
+                    }else if(String.valueOf(s_rotasi.replace("Orientation","").replace(":","")).trim().equals("8")){
+                        img.setRotation(-90);
+                    }
+                    int finalHeight = img.getMeasuredHeight();
+                    int finalWidth = img.getMeasuredWidth();
+
+                    Log.v("height", String.valueOf(finalHeight));
+                    Log.v("widt", String.valueOf(finalWidth));
                 }
-                int finalHeight = img.getMeasuredHeight();
-                int finalWidth = img.getMeasuredWidth();
-
-                Log.v("height", String.valueOf(finalHeight));
-                Log.v("widt", String.valueOf(finalWidth));
-            }
-            else if (resultCode == RESULT_CANCELED) {
-                Toast.makeText(this, "You cancelled the operation", Toast.LENGTH_SHORT).show();
+                else if (resultCode == RESULT_CANCELED) {
+                    Toast.makeText(this, "You cancelled the operation", Toast.LENGTH_SHORT).show();
+                    is_capture = false;
+                }
+            }else{
                 is_capture = false;
             }
-        }else{
-            is_capture = false;
-        }
 
        /* Bitmap bm;
 
@@ -1129,6 +1281,8 @@ public class progress_order extends AppCompatActivity
 
     String realPath = null;
     private void previewCapturedImage() {
+        showExif(fileUri.getPath());
+
         try {
             // hide video preview
             // bimatp factory
@@ -1138,13 +1292,23 @@ public class progress_order extends AppCompatActivity
             // images
             options.inSampleSize = 2;
 
+            ExifInterface exif = new ExifInterface(fileUri.getPath());
+            ShowExif(exif);
+
+
+
             final Bitmap bitmap = BitmapFactory.decodeFile(fileUri.getPath(), options);
+
+
 
             img.setImageBitmap(bitmap);
             Path = String.valueOf(fileUri.getPath());
+            is_capture = true;
         } catch (NullPointerException e) {
             e.printStackTrace();
             Log.v("erorpreview","_test"+String.valueOf(e));
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 
@@ -1550,8 +1714,13 @@ public class progress_order extends AppCompatActivity
                     pg.dismiss();
                     if(uploaded){
                         new putProgress().execute();
-                        img.setImageDrawable(ctx.getDrawable(R.drawable.camera));
-                        img.setRotation(0);
+                        if(s_mode.equals("1")){
+                            img.setImageDrawable(ctx.getDrawable(R.drawable.camera));
+                            img.setRotation(0);
+                        }else{
+                            //img.setImageDrawable(getDrawable(R.drawable.camera));
+                        }
+
                         Toast.makeText(progress_order.this,"Data Berhasil Terinsert",Toast.LENGTH_LONG).show();
                     }else{
                         Toast.makeText(progress_order.this,"Upload gagal check koneksi anda terlebih dahulu",Toast.LENGTH_LONG).show();
@@ -1659,6 +1828,7 @@ public class progress_order extends AppCompatActivity
             String S_nama_foto = null;
             String S_task_id = null;
             String S_address = null;
+            String S_deskripsi_foto = null;
             Log.v("put_progress","test");
             try {
                  S_latitude = URLEncoder.encode(s_latitude,"utf-8");
@@ -1666,6 +1836,7 @@ public class progress_order extends AppCompatActivity
                  S_nama_foto = URLEncoder.encode(nama_foto,"utf-8");
                  S_task_id = URLEncoder.encode(s_task_id,"utf-8");
                  S_address = URLEncoder.encode(s_address,"utf-8");
+                 S_deskripsi_foto = URLEncoder.encode(e_deskripsi_foto.getText().toString(),"utf-8");
             } catch (UnsupportedEncodingException e) {
                 e.printStackTrace();
             }
@@ -1678,6 +1849,7 @@ public class progress_order extends AppCompatActivity
                         "&latitude="+S_latitude+
                         "&longitude="+S_longitude+
                         "&address="+S_address+
+                        "&deskripsi_foto="+S_deskripsi_foto+
                         "&type="+s_type+
                         "&creator="+id_creator);
                 JSONObject object = jsParser.AmbilJson(api.url+"put_progress.php?task_id="+S_task_id+
@@ -1729,9 +1901,7 @@ public class progress_order extends AppCompatActivity
             }catch (Exception e){
 
             }
-
         }
-
     }
 
     public void simpanTask(View v){
@@ -1747,7 +1917,17 @@ public class progress_order extends AppCompatActivity
     }
 
     public void takeFoto(View v){
-        openCameraIntent();
+        if(s_mode.equals("1")){
+            openCameraIntent();
+        }else{
+            Intent cameraIntent = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
+            fileUri = getOutputMediaFileUri(MEDIA_TYPE_IMAGE);
+            cameraIntent.putExtra(MediaStore.EXTRA_OUTPUT, fileUri);
+            startActivityForResult(cameraIntent, CAMERA_CAPTURE_IMAGE_REQUEST_CODE);
+        }
+
+
+
         /*Intent cameraIntent = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
         fileUri = getOutputMediaFileUri(MEDIA_TYPE_IMAGE);
         cameraIntent.putExtra(MediaStore.EXTRA_OUTPUT, fileUri);
@@ -1760,18 +1940,20 @@ public class progress_order extends AppCompatActivity
         startActivityForResult(intent, CAMERA_CAPTURE_IMAGE_REQUEST_CODE);*/
     }
 
-    void showExif(Uri photoUri){
+    void showExif(String photoUri){
 
         if(photoUri != null){
-
-            String photoPath = getRealPathFromURI(photoUri);
 
             try {
                 /*
                 ExifInterface (String filename) added in API level 5
                  */
-                ExifInterface exifInterface = new ExifInterface(photoPath);
+                ExifInterface exifInterface = new ExifInterface(photoUri);
 
+
+                exif_width  = exifInterface.getAttribute(ExifInterface.TAG_IMAGE_WIDTH);
+                exif_height = exifInterface.getAttribute(ExifInterface.TAG_IMAGE_LENGTH);
+                Log.v("pathFoto",photoUri);
                 String exif="Exif: ";
                 exif += "\nIMAGE_LENGTH: " +
                         exifInterface.getAttribute(ExifInterface.TAG_IMAGE_LENGTH);
@@ -1807,21 +1989,22 @@ public class progress_order extends AppCompatActivity
                 exif += "\n TAG_GPS_PROCESSING_METHOD: " +
                         exifInterface.getAttribute(ExifInterface.TAG_GPS_PROCESSING_METHOD);
 
-                Toast.makeText(getApplicationContext(),
-                        exif,
-                        Toast.LENGTH_LONG).show();
+//                Toast.makeText(getApplicationContext(),
+//                        exif,
+//                        Toast.LENGTH_LONG).show();
 
+                Log.v("meta",exif);
 
             } catch (FileNotFoundException e) {
                 e.printStackTrace();
-                Toast.makeText(getApplicationContext(),
-                        "Something wrong:\n" + e.toString(),
-                        Toast.LENGTH_LONG).show();
+//                Toast.makeText(getApplicationContext(),
+//                        "Something wrong:\n" + e.toString(),
+//                        Toast.LENGTH_LONG).show();
             } catch (IOException e) {
                 e.printStackTrace();
-                Toast.makeText(getApplicationContext(),
-                        "Something wrong:\n" + e.toString(),
-                        Toast.LENGTH_LONG).show();
+//                Toast.makeText(getApplicationContext(),
+//                        "Something wrong:\n" + e.toString(),
+//                        Toast.LENGTH_LONG).show();
             }
 
         }else{
@@ -1888,6 +2071,8 @@ public class progress_order extends AppCompatActivity
             catch (IOException e) {
                 e.printStackTrace();
                 return;
+            }catch (Exception e){
+                Toast.makeText(progress_order.this,"err",Toast.LENGTH_LONG).show();
             }
             Uri photoUri = FileProvider.getUriForFile(this, getPackageName() +".provider", photoFile);
             pictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoUri);
@@ -2111,8 +2296,19 @@ public class progress_order extends AppCompatActivity
                 t_latitude = (TextView)findViewById(R.id.d_latitude);
                 t_longitude = (TextView)findViewById(R.id.d_longitude);
 
-                t_latitude.setText(" "+s_latitude);
-                t_longitude.setText(" "+s_longitude);
+                if(s_latitude.length() > 10){
+                    t_latitude.setText(" "+s_latitude.substring(0,10));
+                }else{
+                    t_latitude.setText(" "+s_latitude);
+                }
+
+                if(s_longitude.length() > 10){
+                    t_longitude.setText(" "+s_longitude.substring(0,10));
+                }else{
+                    t_longitude.setText(" "+s_longitude);
+                }
+
+
             }
 
         }
@@ -2206,6 +2402,7 @@ public class progress_order extends AppCompatActivity
     private void ShowExif(ExifInterface exif)
     {
         String myAttribute="Exif information ---\n";
+
         myAttribute += getTagString(ExifInterface.TAG_DATETIME, exif);
         myAttribute += getTagString(ExifInterface.TAG_FLASH, exif);
         myAttribute += getTagString(ExifInterface.TAG_GPS_LATITUDE, exif);
@@ -2219,8 +2416,11 @@ public class progress_order extends AppCompatActivity
         myAttribute += getTagString(ExifInterface.TAG_ORIENTATION, exif);
         myAttribute += getTagString(ExifInterface.TAG_WHITE_BALANCE, exif);
         s_rotasi = getTagString(ExifInterface.TAG_ORIENTATION, exif);
+        myAttribute += getTagString(ExifInterface.TAG_FOCAL_PLANE_X_RESOLUTION, exif);
+        myAttribute += getTagString(ExifInterface.TAG_FOCAL_PLANE_Y_RESOLUTION, exif);
 
-        Log.v("Log",s_rotasi);
+
+        Log.v("LogExif",myAttribute);
 
     }
 
@@ -2229,6 +2429,44 @@ public class progress_order extends AppCompatActivity
         return(tag + " : " + exif.getAttribute(tag) + "\n");
     }
 
+    public String convertDay(String day){
+        String output_day = null;
+        if(day.toUpperCase().equals("MON")){
+            output_day = "Senin";
+        }else if(day.toUpperCase().equals("TUE")){
+            output_day = "Selasa";
+        }else if(day.toUpperCase().equals("WED")){
+            output_day = "Rabu";
+        }else if(day.toUpperCase().equals("THU")){
+            output_day = "kamis";
+        }else if(day.toUpperCase().equals("FRI")){
+            output_day = "Jumat";
+        }else if(day.toUpperCase().equals("SAT")){
+            output_day = "Sabtu";
+        }else if(day.toUpperCase().equals("SUN")){
+            output_day = "Minggu";
+        }else{
+            output_day = day;
+        }
+        return output_day;
+    }
 
 
+//    @Override
+//    public void onWindowFocusChanged(boolean hasFocus) {
+//        super.onWindowFocusChanged(hasFocus);
+//        if (hasFocus == true) {
+//            LinearLayout myLinearLayout = (LinearLayout) findViewById(R.id.ln);
+//            int layoutWidth = myLinearLayout.getWidth();
+//            int layoutHeight = myLinearLayout.getHeight();
+//
+//            LayoutInflater li = LayoutInflater.from(progress_order.this);
+//            View promptsView = li.inflate(R.layout.prompt_upload, null);
+//            ln = (RelativeLayout)promptsView.findViewById(R.id.ln_prompt);
+//            int l = ln.getWidth();
+//            int h = ln.getHeight();
+//            Log.v("lenght",String.valueOf(l));
+//            Log.v("lenght2",String.valueOf(h));
+//        }
+//    }
 }

@@ -53,10 +53,10 @@
                     android:layout_marginTop="10dp"
                     android:textStyle="bold"
                     android:textColor="@color/white"
-                    android:id="@+id/create_mapping"
+                    android:id="@+id/copy_rute"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Mapping User dan Rute" />
+                    android:text="copy rute to corrective" />
 
                 <Button
                     android:background="@color/colorPrimaryDark"

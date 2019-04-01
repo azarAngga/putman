@@ -58,6 +58,13 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content" />
 
+                    <RadioButton
+                        android:id="@+id/rb_non_ms"
+                        android:layout_weight="1"
+                        android:text="Non MS"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content" />
+
                 </RadioGroup>
 
                 <View
@@ -128,13 +135,13 @@
                         <RadioButton
                             android:checked="true"
                             android:id="@+id/ring_1"
-                            android:text="Ring 1"
+                            android:text="FTTH"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content" />
 
                         <RadioButton
                             android:id="@+id/ring_2"
-                            android:text="Ring 2"
+                            android:text="FBB"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content" />
 
@@ -148,7 +155,7 @@
 
                                 android:layout_weight="1"
                                 android:id="@+id/ring_other"
-                                android:text="Ring Other"
+                                android:text="Non MS"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content" />
 
@@ -223,7 +230,7 @@
                     android:id="@+id/ln_task"
                     android:orientation="vertical"
                     android:layout_width="match_parent"
-                    android:layout_height="100dp">
+                    android:layout_height="match_parent">
 
                 </LinearLayout>
 
