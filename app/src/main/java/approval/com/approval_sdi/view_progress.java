@@ -36,7 +36,6 @@ import java.util.Map;
 
 import reportku.com.id.R;
 
-
 public class view_progress extends AppCompatActivity {
 
     TextView nama_log,nama_pekerjaan_log,keterangan_kerja;

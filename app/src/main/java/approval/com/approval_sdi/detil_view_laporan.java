@@ -557,7 +557,7 @@ public class detil_view_laporan extends AppCompatActivity implements RadioGroup.
 
                 input = connection.getInputStream();
 
-                output = new FileOutputStream("/sdcard/reportku/"+g[8]);
+                output = new FileOutputStream("/sdcard/putman/"+g[8]);
                 //output = new FileOutputStream("/sdcard/reportku/hana.apk");
 
                 byte data[] = new byte[4096];
@@ -635,7 +635,7 @@ public class detil_view_laporan extends AppCompatActivity implements RadioGroup.
                 try {
                     Intent intent = new Intent(Intent.ACTION_VIEW);
                     intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                    File f = new File("/mnt/sdcard/reportku/"+g[8]);
+                    File f = new File("/mnt/sdcard/putman/"+g[8]);
 
                     Uri uri = null;
 

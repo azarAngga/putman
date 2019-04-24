@@ -192,7 +192,7 @@ public class create_report_by_date extends AppCompatActivity implements View.OnC
 
                 input = connection.getInputStream();
 
-                output = new FileOutputStream(Environment.getExternalStorageDirectory()+"/reportku/"+model.s_nama_file);
+                output = new FileOutputStream(Environment.getExternalStorageDirectory()+"/putman/"+model.s_nama_file);
                 //output = new FileOutputStream("/sdcard/reportku/hana.apk");
 
                 byte data[] = new byte[4096];
@@ -268,7 +268,7 @@ public class create_report_by_date extends AppCompatActivity implements View.OnC
                         Intent intent = new Intent(Intent.ACTION_VIEW);
                         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                         //File f = new File("/mnt/sdcard/reportku/"+model.s_nama_file);
-                        File f = new File(Environment.getExternalStorageDirectory()+"/reportku/"+model.s_nama_file);
+                        File f = new File(Environment.getExternalStorageDirectory()+"/putman/"+model.s_nama_file);
 
                         Uri uri = null;
 
@@ -356,7 +356,7 @@ public class create_report_by_date extends AppCompatActivity implements View.OnC
 
     public void createDir() {
         // create a File object for the parent directory
-        String dir = Environment.getExternalStorageDirectory()+"/reportku/";
+        String dir = Environment.getExternalStorageDirectory()+"/putman/";
         //model.toast(ctx,dir);
         File wallpaperDirectory = new File(dir);
         // have the object build the directory structure, if needed.
@@ -379,14 +379,14 @@ public class create_report_by_date extends AppCompatActivity implements View.OnC
         share.setType("application/x-excel");
 
         String imagePath = Environment.getExternalStorageDirectory()
-                + "/reportku/"+nama_file;
+                + "/putman/"+nama_file;
 
         Log.v("list",imagePath);
 
         //File imageFileToShare = new File(imagePath);
         //Uri uri = Uri.fromFile(imageFileToShare);
 
-        File f = new File(Environment.getExternalStorageDirectory()+"/reportku/"+nama_file);
+        File f = new File(Environment.getExternalStorageDirectory()+"/putman/"+nama_file);
 
 
         Uri imageUri = FileProvider.getUriForFile(

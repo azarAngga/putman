@@ -301,7 +301,7 @@ public class login extends Activity{
 
     public void createDir() {
         // create a File object for the parent directory
-        String dir = "/sdcard/reportku/";
+        String dir = "/sdcard/putman/";
         File wallpaperDirectory = new File(dir);
         // have the object build the directory structure, if needed.
         wallpaperDirectory.mkdirs();

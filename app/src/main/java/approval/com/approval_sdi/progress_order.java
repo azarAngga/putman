@@ -760,6 +760,8 @@ public class progress_order extends AppCompatActivity
         if(String.valueOf(s_rotasi.replace("Orientation","").replace(":","")).trim().equals("3")){
             foto.setRotation(180);
         }
+
+
         //foto.setRotation(90);
 
         //foto.setImageBitmap(Bitmap.createScaledBitmap(myBitmap, 3000, 2000, false));
@@ -1608,6 +1610,7 @@ public class progress_order extends AppCompatActivity
             Log.v("nama_bit",timeStamp);
             ByteArrayOutputStream bos = new ByteArrayOutputStream();
             bm_create.compress(Bitmap.CompressFormat.JPEG, 100, bos);
+            simpaLocal(bm_create);
             byte[] data = bos.toByteArray();
             HttpClient httpClient = new DefaultHttpClient();
             HttpPost postRequest = new HttpPost(urlServer);
@@ -2469,4 +2472,39 @@ public class progress_order extends AppCompatActivity
 //            Log.v("lenght2",String.valueOf(h));
 //        }
 //    }
+
+    public void simpaLocal(Bitmap bitmap){
+        File dir = new File(Environment.getExternalStorageDirectory().getAbsolutePath(),"putman");
+        if (!dir.exists())
+            dir.mkdirs();
+
+        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(new Date());
+        String nama_file_ = timeStamp+".jpg";
+
+        File file = new File(dir, nama_file_);
+
+        FileOutputStream out = null;
+        try {
+            out = new FileOutputStream(file);
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+            Log.v("errorMap",String.valueOf(e));
+        }
+        try{
+            bitmap.compress(Bitmap.CompressFormat.PNG, 90, out);
+        }catch (Exception e){
+            Toast.makeText(progress_order.this,"Error 303",Toast.LENGTH_LONG).show();
+        }
+
+
+    }
+
+    public void createDir() {
+        // create a File object for the parent directory
+        String dir = Environment.getExternalStorageDirectory()+"/putman/";
+        //model.toast(ctx,dir);
+        File wallpaperDirectory = new File(dir);
+        // have the object build the directory structure, if needed.
+        wallpaperDirectory.mkdirs();
+    }
 }
